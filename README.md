@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/free-fermion-lib.svg)](https://pypi.org/project/free-fermion-lib/)
 [![Python versions](https://img.shields.io/pypi/pyversions/free-fermion-lib.svg)](https://pypi.org/project/free-fermion-lib/)
-[![Build Status](https://github.com/jdwhitfield/free-fermion-lib/workflows/CI/badge.svg)](https://github.com/jdwhitfield/free-fermion-lib/actions)
+<!--[![Build Status](https://github.com/jdwhitfield/free-fermion-lib/workflows/CI/badge.svg)](https://github.com/jdwhitfield/free-fermion-lib/actions)-->
 [![Downloads](https://img.shields.io/pypi/dm/free-fermion-lib.svg)](https://pypi.org/project/free-fermion-lib/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation Status](https://readthedocs.org/projects/free-fermion-lib/badge/?version=latest)](https://free-fermion-lib.readthedocs.io/en/latest/?badge=latest)
