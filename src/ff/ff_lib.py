@@ -54,6 +54,119 @@ def pauli_matrices():
     return sigma_x, sigma_y, sigma_z
 
 
+def generate_pauli_group(n, verbose=False):
+    """
+    Generate all 4^n elements of the Pauli group for n qubits.
+    
+    This function generates all possible tensor products of the Pauli matrices
+    (I, X, Y, Z) for n qubits, creating the complete Pauli group of order 4^n.
+    Each element is a 2^n x 2^n matrix representing a Pauli operator acting
+    on the n-qubit Hilbert space.
+    
+    The Pauli group is fundamental in quantum error correction, quantum
+    computing, and stabilizer formalism. It consists of all n-fold tensor
+    products of single-qubit Pauli operators.
+    
+    Args:
+        n (int): The number of qubits. Must be a positive integer.
+        verbose (bool): If True, print the Pauli string name for each operator
+                       as it's generated (default: False).
+        
+    Returns:
+        list: A list of 4^n numpy arrays, each of shape (2^n, 2^n),
+              representing all Pauli operators for n qubits. The operators
+              are ordered lexicographically by their tensor product structure.
+              
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is not positive.
+        
+    Examples:
+        >>> # Single qubit case (n=1)
+        >>> pauli_1 = generate_pauli_group(1)
+        >>> len(pauli_1)
+        4
+        >>> pauli_1[0]  # Identity
+        array([[1, 0],
+               [0, 1]])
+        >>> pauli_1[1]  # Pauli-X
+        array([[0, 1],
+               [1, 0]])
+               
+        >>> # Two qubit case (n=2) with verbose output
+        >>> pauli_2 = generate_pauli_group(2, verbose=True)
+        II
+        IX
+        IY
+        IZ
+        XI
+        XX
+        XY
+        XZ
+        YI
+        YX
+        YY
+        YZ
+        ZI
+        ZX
+        ZY
+        ZZ
+        >>> len(pauli_2)
+        16
+        >>> pauli_2[0].shape
+        (4, 4)
+        
+    Notes:
+        - The function uses the existing pauli_matrices() function for consistency
+        - Memory usage scales as O(4^n * 4^n) = O(16^n), so use with caution for large n
+        - For n > 4, consider using sparse representations or symbolic methods
+        - The ordering follows itertools.product convention: rightmost index varies fastest
+        - Verbose output shows Pauli strings in standard notation (I, X, Y, Z)
+    """
+    # Input validation
+    if not isinstance(n, int):
+        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
+    
+    if n <= 0:
+        raise ValueError(f"Number of qubits must be positive, got {n}")
+        
+    # Use existing pauli_matrices function for consistency
+    sigma_x, sigma_y, sigma_z = pauli_matrices()
+    identity = np.eye(2, dtype=complex)
+    paulis = [identity, sigma_x, sigma_y, sigma_z]
+    pauli_names = ['I', 'X', 'Y', 'Z']
+    
+    # Import itertools.product for generating all combinations
+    from itertools import product as itertools_product
+    
+    pauli_group = []
+    
+    # Generate all 4^n combinations of Pauli matrices
+    for pauli_combination in itertools_product(paulis, repeat=n):
+        # Start with the first Pauli matrix
+        tensor_product = pauli_combination[0]
+        
+        # Compute tensor product for remaining matrices
+        for i in range(1, n):
+            tensor_product = np.kron(tensor_product, pauli_combination[i])
+            
+        pauli_group.append(tensor_product)
+        
+        # Print Pauli string name if verbose mode is enabled
+        if verbose:
+            # Get corresponding names for this combination
+            pauli_string = ""
+            for pauli_matrix in pauli_combination:
+                # Find which Pauli matrix this is by comparing with our list
+                for idx, p in enumerate(paulis):
+                    if np.array_equal(pauli_matrix, p):
+                        pauli_string += pauli_names[idx]
+                        break
+            print(pauli_string)
+    
+    return pauli_group
+
+
 def jordan_wigner_lowering(n_sites):
     """
     Define annihilation operators using the Jordan-Wigner transform.
@@ -295,13 +408,14 @@ def build_H(n_sites, A, B=None):
     return H
 
 
-def random_FF_rotation(n_sites, seed=None, returnH=False):
+def random_FF_rotation(n_sites, seed=None, returnH=False, returnOrb=False):
     """Generate a random free fermion rotation matrix
 
     Args:
         n_sites: The number of sites
-        seed: Random seed for reproducibility (optional)
-        returnH: If True, return the generator matrix instead
+        seed: Random seed for reproducibility (default: None)
+        returnH: If True, return the generator matrix instead (default: False)
+        returnOrb: If True, return the orbital rotation matrix C (default: False)
 
     Returns:
         A random free fermion rotation matrix of dimension 2*N for N sites
@@ -315,6 +429,9 @@ def random_FF_rotation(n_sites, seed=None, returnH=False):
 
     C = Omega.conj().T @ randO @ Omega
     assert is_symp(C), "Generated matrix is not symplectic"
+
+    if returnOrb:
+        return C  # Return the orbital rotation matrix
 
     z = -1j
     h = -logm(C) / z
@@ -704,9 +821,9 @@ def correlation_matrix(rho):
     """
     Calculates the following two-point correlation matrix
 
-    Γ = ⟨vec α vec α^t⟩
-    Γ_ij = Tr[rho α_i α_j]
-
+    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle 
+    .. math:: \Gamma_{ij} = Tr[\rho \alpha_i \alpha_j]
+    
     for JW fermionic operators in the [a^+ a] ordering
 
     Args:
@@ -726,12 +843,12 @@ def compute_2corr_matrix(rho, n_sites, alphas=None, conjugation=None):
     """
     Calculate the two-point correlation matrix
 
-    Γ = ⟨vec α vec α^t⟩
-    Γ_{ij} = Tr[rho α_i α_j]
-
+    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle 
+    .. math:: \Gamma_{ij} = Tr[\rho \alpha_i \alpha_j]
+    
     By changing the input conjugation parameter, this function also computes
-    P = ⟨vec α vec α†⟩ (conjugation == T)
-    η = ⟨vec α† vec α^t⟩ (conjugation < 0)
+    P = ⟨vec \alpha vec α†⟩ (conjugation == T)
+    η = ⟨vec \alpha^\dagger vec α^t⟩ (conjugation < 0)
 
     By default the operators are not conjugated but if
     `conjugation` is True or positive:

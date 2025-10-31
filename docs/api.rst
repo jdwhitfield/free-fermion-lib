@@ -27,6 +27,40 @@ Graph Theory Module (ff_graph_theory)
    :undoc-members:
    :show-inheritance:
 
+Distance Measures Module (ff_distance_measures)
+-----------------------------------------------
+
+.. automodule:: ff.ff_distance_measures
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+The distance measures module provides fundamental tools for quantifying quantum states
+and their proximity to classical, stabilizer, or free-fermion subspaces. Key measures include:
+
+- **Stabilizer Rényi Entropy (SRE)**: Quantifies deviation from stabilizer states
+- **Fermionic Anti-Flatness (FAF)**: Measures distance from free-fermion behavior
+- **General entropy measures**: Rényi entropy, linear entropy for probability distributions
+- **Stabilizer and covariance distributions**: Core probability distributions for analysis
+
+Random States Module (ff_random_states)
+---------------------------------------
+
+.. automodule:: ff.ff_random_states
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+The random states module provides comprehensive random state generation capabilities
+for quantum systems, including:
+
+- **Haar random states**: Uniformly distributed pure states over qubit Hilbert spaces
+- **Clifford states**: Random stabilizer states using the Stim package (optional dependency)
+- **Free fermion states**: Various methods for generating random FF states with different constraints
+- **Path construction**: Unitary and linear interpolation between quantum states
+
+Note: Some functions require the optional ``stim`` package for Clifford state generation.
+
 Utilities Module (ff_utils)
 ---------------------------
 

@@ -9,6 +9,8 @@ Modules:
     ff_lib: Core quantum physics and linear algebra functions
     ff_combinatorics: Combinatorial matrix functions (pfaffian, hafnian, etc.)
     ff_graph_theory: Graph algorithms and visualization for planar graphs
+    ff_distance_measures: Distance measures for quantum states (SRE, FAF, etc.)
+    ff_random_states: Random state generators and path construction functions
     ff_utils: Common utility functions
 
 Copyright 2025 James.D.Whitfield@dartmouth.edu
@@ -41,6 +43,7 @@ from .ff_graph_theory import (
 from .ff_lib import (
     permutation_to_matrix,
     pauli_matrices,
+    generate_pauli_group,
     jordan_wigner_lowering,
     jordan_wigner_alphas,
     jordan_wigner_majoranas,
@@ -78,11 +81,43 @@ from .ff_utils import (
     kron_plus,
 )
 
+# Distance measure functions from ff_distance_measures
+from .ff_distance_measures import (
+    stabilizer_distribution,
+    SRE,
+    renyi_entropy,
+    linear_entropy,
+    cov_distribution,
+    FAF,
+)
+
+# Random state generation functions from ff_random_states
+from .ff_random_states import (
+    random_qubit_pure_state,
+    random_CHP_state,
+    random_FF_state_randH,
+    random_FF_state_rotPDF,
+    random_FF_pure_state_W0,
+    random_FF_pure_state_WN,
+    random_FF_pure_state_CN,
+    get_orthogonal_vectors,
+    build_unitary_path,
+    build_linear_path,
+)
+
+# Additional utility functions from ff_utils
+from .ff_utils import (
+    cast_to_density_matrix,
+    cast_to_pdf,
+    analyze_pdf,
+)
+
 # Define what gets imported with "from ff import *"
 __all__ = [
     # Core quantum physics functions from ff_lib
     "permutation_to_matrix",
     "pauli_matrices",
+    "generate_pauli_group",
     "jordan_wigner_lowering",
     "jordan_wigner_alphas",
     "jordan_wigner_majoranas",
@@ -134,4 +169,26 @@ __all__ = [
     "formatted_output",
     "generate_random_bitstring",
     "kron_plus",
+    # Distance measure functions from ff_distance_measures
+    "stabilizer_distribution",
+    "SRE",
+    "renyi_entropy",
+    "linear_entropy",
+    "cov_distribution",
+    "FAF",
+    # Random state generation functions from ff_random_states
+    "random_qubit_pure_state",
+    "random_CHP_state",
+    "random_FF_state_randH",
+    "random_FF_state_rotPDF",
+    "random_FF_pure_state_W0",
+    "random_FF_pure_state_WN",
+    "random_FF_pure_state_CN",
+    "get_orthogonal_vectors",
+    "build_unitary_path",
+    "build_linear_path",
+    # Additional utility functions from ff_utils
+    "cast_to_density_matrix",
+    "cast_to_pdf",
+    "analyze_pdf",
 ]
