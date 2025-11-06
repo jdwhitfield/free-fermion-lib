@@ -8,7 +8,7 @@
 [![Documentation Status](https://readthedocs.org/projects/free-fermion-lib/badge/?version=latest)](https://free-fermion-lib.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/jdwhitfield/free-fermion-lib/branch/main/graph/badge.svg)](https://codecov.io/gh/jdwhitfield/free-fermion-lib)
 
-A comprehensive Python library for working with free fermion quantum systems, providing tools for combinatorial functions, graph theory algorithms, and quantum physics utilities. This work was supported by the U.S. Department of Energy, Office of Basic Energy Sciences, under Award DE-SC0019374 and by Army Research Office grant W911NF2410043.
+A comprehensive Python library for working with free fermion quantum systems, providing tools for combinatorial functions, graph theory algorithms, quantum physics utilities, and advanced distance measures for quantum state analysis. The library includes statistical and quantum distance measures for characterizing quantum states and their proximity to classical, stabilizer, or free-fermion subspaces. This work was supported by the U.S. Department of Energy, Office of Basic Energy Sciences, under Award DE-SC0019374 and by Army Research Office grant W911NF2410043.
 
 ## Table of Contents
 
@@ -91,6 +91,14 @@ pfaffian_value = ff.pf(skew_matrix)
   - Fermionic correlation matrix computations
   - Wick's theorem implementation
 
+- **[`ff_distance_measures`](https://free-fermion-lib.readthedocs.io/en/latest/api.html#ff-distance-measures-module)**: Quantum state distance measures and entropy functions
+  - Stabilizer Rényi Entropy (SRE) for quantifying magic resources
+  - Fermionic Anti-Flatness (FAF) for measuring deviation from free-fermion behavior
+  - Statistical distance measures: Total variation, Jensen-Shannon divergence, Bhattacharyya coefficient
+  - Information-theoretic measures: Kullback-Leibler divergence, Rényi entropy, linear entropy
+  - Quantum distance measures: Trace distance for density matrices
+  - Fermionic covariance distribution analysis
+
 - **[`ff_combinatorics`](https://free-fermion-lib.readthedocs.io/en/latest/api.html#ff-combinatorics-module)**: Combinatorial matrix functions
   - Pfaffian computation via combinatorial formula
   - Hafnian computation
@@ -108,6 +116,27 @@ pfaffian_value = ff.pf(skew_matrix)
   - Random bitstring generation
   - Direct sum operations
   - Pretty printing with numerical precision control
+
+### Statistical Distance Measures
+
+The [`ff_distance_measures`](src/ff/ff_distance_measures.py) module provides a comprehensive suite of distance measures for quantum state analysis:
+
+**Quantum-Specific Measures:**
+- **Stabilizer Rényi Entropy (SRE)**: Quantifies "magic" or non-stabilizer resources in quantum states
+- **Fermionic Anti-Flatness (FAF)**: Measures deviation from free-fermion (Gaussian) behavior
+- **Trace Distance**: Standard quantum distance measure between density matrices
+
+**Statistical Distance Measures:**
+- **Jensen-Shannon Divergence**: Symmetric, bounded version of KL divergence
+- **Total Variation Distance**: L1-based distance between probability distributions
+- **Bhattacharyya Coefficient**: Similarity measure between distributions
+- **Kullback-Leibler Divergence**: Information-theoretic divergence measure
+
+**Entropy Measures:**
+- **Rényi Entropy**: Generalized entropy with tunable parameter α
+- **Linear Entropy**: Efficient measure of mixedness for quantum states
+
+These measures are fundamental tools for characterizing quantum states and their proximity to classical, stabilizer, or free-fermion subspaces in quantum many-body systems.
 
 ## Documentation
 
@@ -167,6 +196,34 @@ G = nx.grid_2d_graph(3, 3)
 oriented_graph = pfaffian_orientation(G)
 ```
 
+### Distance Measures and Quantum State Analysis
+
+```python
+from ff.ff_distance_measures import SRE, FAF, jensen_shannon_divergence, trace_distance
+import numpy as np
+
+# Compute Stabilizer Rényi Entropy for a quantum state
+rho = np.eye(4) / 4  # Maximally mixed 2-qubit state
+sre_value = SRE(rho, a=2)
+print(f"Stabilizer Rényi Entropy: {sre_value}")
+
+# Compute Fermionic Anti-Flatness
+faf_value = FAF(rho, k=2)
+print(f"Fermionic Anti-Flatness: {faf_value}")
+
+# Compare two probability distributions
+p = np.array([0.5, 0.3, 0.2])
+q = np.array([0.4, 0.4, 0.2])
+js_div = jensen_shannon_divergence(p, q)
+print(f"Jensen-Shannon Divergence: {js_div}")
+
+# Compute trace distance between density matrices
+rho1 = np.array([[0.7, 0], [0, 0.3]])
+rho2 = np.array([[0.6, 0], [0, 0.4]])
+td = trace_distance(rho1, rho2)
+print(f"Trace Distance: {td}")
+```
+
 ## API Reference
 
 The complete API documentation is available at [free-fermion-lib.readthedocs.io](https://free-fermion-lib.readthedocs.io/en/latest/api.html).
@@ -178,6 +235,13 @@ The complete API documentation is available at [free-fermion-lib.readthedocs.io]
 | `ff_lib` | `jordan_wigner_alphas()` | Generate Jordan-Wigner operators |
 | `ff_lib` | `build_H()` | Construct Hamiltonian matrices |
 | `ff_lib` | `random_FF_state()` | Generate random Gaussian states |
+| `ff_distance_measures` | `SRE()` | Compute Stabilizer Rényi Entropy |
+| `ff_distance_measures` | `FAF()` | Compute Fermionic Anti-Flatness |
+| `ff_distance_measures` | `stabilizer_distribution()` | Compute stabilizer probability distribution |
+| `ff_distance_measures` | `jensen_shannon_divergence()` | Compute Jensen-Shannon divergence |
+| `ff_distance_measures` | `total_variation_distance()` | Compute total variation distance |
+| `ff_distance_measures` | `trace_distance()` | Compute trace distance between density matrices |
+| `ff_distance_measures` | `relative_entropy()` | Compute Kullback-Leibler divergence |
 | `ff_combinatorics` | `pf()` | Compute matrix pfaffian |
 | `ff_combinatorics` | `hafnian()` | Compute matrix hafnian |
 | `ff_graph_theory` | `pfaffian_orientation()` | Find pfaffian orientation of graphs |

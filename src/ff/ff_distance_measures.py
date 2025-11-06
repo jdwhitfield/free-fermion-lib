@@ -10,6 +10,11 @@ Key functionality:
  - General Rényi entropy and linear entropy measures
  - Fermionic covariance distribution analysis
  - Fermionic Anti-Flatness (FAF) distance measure
+ - Kullback-Leibler divergence for probability distributions
+ - Jensen-Shannon divergence for probability distributions
+ - Trace distance for density matrices 
+ - Total variation distance for probability distributions
+ - Bhattacharyya coefficient for probability distributions
 
 The distance measures implemented here are fundamental tools for characterizing
 quantum states and their proximity to classical, stabilizer, or free-fermion
@@ -17,6 +22,8 @@ subspaces in quantum many-body systems.
 
 Copyright 2025 James.D.Whitfield@dartmouth.edu
 """
+
+
 
 import numpy as np
 from scipy.stats import entropy
@@ -443,6 +450,228 @@ def cov_distribution(rho):
     pm = np.square(eigenvalues)
 
     return pm
+
+
+def total_variation_distance(p,q):
+    """
+    Compute the total variation distance between two probability distributions.
+
+    The trace distance is a measure of distinguishability between two probability
+    distributions. It is defined as:
+    .. math::
+    
+        D_{\\text{trace}}(p, q) = \\frac{1}{2} \\sum_i |p_i - q_i|
+    
+    where :math:`p` and :math:`q` are the two probability distributions.
+    Args:
+        p (numpy.ndarray): First probability distribution as a 1D array. Must be normalized
+                          such that Σ_i p_i = 1 and all elements p_i ≥ 0.
+        q (numpy.ndarray): Second probability distribution as a 1D array. Must be normalized
+                          such that Σ_i q_i = 1 and all elements q_i ≥ 0.
+
+    Returns:
+        float: The trace distance D_trace(p, q).
+               - 0 ≤ D_trace ≤ 1
+               - D_trace = 0 if and only if p = q
+    Examples:
+        >>> # Simple distributions
+        >>> p = np.array([0.5, 0.5])
+        >>> q = np.array([0.9, 0.1])
+        >>> dtrace = trace_distance(p, q)
+        >>> dtrace > 0
+        True
+        >>> dtrace_zero = trace_distance(p, p)
+        >>> np.allclose(dtrace_zero, 0)
+        True
+    Notes:
+        - The function coverts input wave functions and density matrices to probability distributions
+    References:
+        - Nielsen, M. A., & Chuang, I. L. (2010). Quantum computation and quantum information.
+    """
+    # Ensure p and q are valid probability distributions
+    p = cast_to_pdf(p)
+    q = cast_to_pdf(q)
+
+    # Compute trace distance
+    dtrace = 0.5 * np.sum(np.abs(p - q))
+
+    return dtrace
+
+
+def trace_distance(A,B):
+    """
+    Computes the trace distance between two matrices A and B.
+
+    The trace distance is a quantum measure used to quantify the distinguishability
+    between two quantum states represented by density matrices A and B. It is defined as:
+    .. math:: D_{trace}(A, B) = \\frac{1}{2} \\text{Tr} |A - B|
+
+    where :math:`|X| = \\sqrt{X^\\dagger X}` is the positive square root of the operator X. 
+    Args:
+        A: First density matrix (numpy array or array-like)
+        B: Second density matrix (numpy array or array-like)
+    Returns:
+        Trace distance value (float)
+
+    Notes:
+        - The function assumes A and B are matrices and casts them to density matrices as needed
+        - The trace distance ranges from 0 (identical states) to 1 (orthogonal states)
+        - This measure is widely used in quantum information theory to assess state distinguishability
+    References:
+        - Nielsen, M. A., & Chuang, I. L. (2010). Quantum computation and quantum information.
+    """
+
+    A = cast_to_density_matrix(A)
+    B = cast_to_density_matrix(B)
+
+    diff = A - B
+
+    evals = np.linalg.eigvals(diff)
+
+    return 0.5*np.sum(abs(evals))
+
+
+def relative_entropy(p, q):
+    """
+    Compute the Kullback-Leibler (KL) divergence between two probability distributions.
+    
+    The KL divergence is a measure of how one probability distribution diverges from
+    a second, expected probability distribution. It is defined as:
+    
+    .. math::
+    
+        D_{KL}(p || q) = \\sum_i p_i \\log\\left(\\frac{p_i}{q_i}\\right)
+    
+    where :math:`p` is the true distribution and :math:`q` is the reference distribution.
+    
+    Args:
+        p (numpy.ndarray): True probability distribution as a 1D array. Must be normalized
+                          such that Σ_i p_i = 1 and all elements p_i ≥ 0.
+        q (numpy.ndarray): Reference probability distribution as a 1D array. Must be normalized
+                          such that Σ_i q_i = 1 and all elements q_i ≥ 0.
+                          
+    Returns:
+        float: The KL divergence D_KL(p || q).
+               - D_KL ≥ 0, with equality if and only if p = q
+               
+    Examples:
+        >>> # Simple distributions
+        >>> p = np.array([0.5, 0.5])
+        >>> q = np.array([0.9, 0.1])
+        >>> dkl = relative_entropy(p, q)
+        >>> dkl > 0
+        True
+        >>> dkl_zero = relative_entropy(p, p)
+        >>> np.allclose(dkl_zero, 0)
+        True
+
+    Notes:
+        - The function uses scipy.stats.entropy for numerical stability
+        - KL divergence is not symmetric: D_KL(p || q) ≠ D_KL(q || p)
+        - The function coverts input wave functions and density matrices to probability distributions  
+    References:
+        - Kullback, S., & Leibler, R. A. (1951). On information and sufficiency.
+        - Cover, T. M., & Thomas, J. A. (2006). Elements of information theory.
+    """
+    # Ensure p and q are valid probability distributions
+    p = cast_to_pdf(p)
+    q = cast_to_pdf(q)
+
+    # Compute KL divergence using scipy.stats.entropy
+    dkl = entropy(p, qk=q)
+
+    return dkl
+
+
+def bhattacharyya_coeff(p, q):
+    """
+    Compute the Bhattacharyya coefficient between two probability distributions.
+    
+    The Bhattacharyya coefficient is a measure of similarity between two probability
+    distributions. It is defined as:
+    
+    .. math::
+    
+        BC(p, q) = \\sum_i \\sqrt{p_i q_i}
+    
+    where :math:`p` and :math:`q` are the two probability distributions.
+    
+    Args:
+        p (numpy.ndarray): First probability distribution as a 1D array. Must be normalized
+                          such that Σ_i p_i = 1 and all elements p_i ≥ 0.
+        q (numpy.ndarray): Second probability distribution as a 1D array. Must be normalized
+                          such that Σ_i q_i = 1 and all elements q_i ≥ 0.
+                          
+    Returns:
+        float: The Bhattacharyya coefficient BC(p, q).
+               
+    Notes:  
+        - The function coverts input wave functions and density matrices to probability distributions
+    """
+    # Ensure p and q are valid probability distributions
+    p = cast_to_pdf(p)
+    q = cast_to_pdf(q)
+
+    # Compute Bhattacharyya coefficient
+    bc = np.sum(np.sqrt(p * q))
+
+    return bc
+
+
+def jensen_shannon_divergence(p, q):
+    """
+    Compute the Jensen-Shannon (JS) divergence between two probability distributions.
+    
+    The JS divergence is a symmetric and bounded measure of similarity between two
+    probability distributions. It is defined as:
+    
+    .. math::
+    
+        D_{JS}(p || q) = \\frac{1}{2} D_{KL}(p || m) + \\frac{1}{2} D_{KL}(q || m)
+    
+    where :math:`m = \\frac{1}{2}(p + q)` is the average distribution, and 
+    :math:`D_{KL}` is the Kullback-Leibler divergence.
+    
+    Args:
+        p (numpy.ndarray): First probability distribution as a 1D array. Must be normalized
+                          such that Σ_i p_i = 1 and all elements p_i ≥ 0.
+        q (numpy.ndarray): Second probability distribution as a 1D array. Must be normalized
+                          such that Σ_i q_i = 1 and all elements q_i ≥ 0.
+                          
+    Returns:
+        float: The JS divergence D_JS(p || q).
+               - 0 ≤ D_JS ≤ log(2)
+               - D_JS = 0 if and only if p = q
+               
+    Examples:
+        >>> # Simple distributions
+        >>> p = np.array([0.5, 0.5])
+        >>> q = np.array([0.9, 0.1])
+        >>> djs = jensen_shannon_divergence(p, q)
+        >>> djs > 0
+        True
+        >>> djs_zero = jensen_shannon_divergence(p, p)
+        >>> np.allclose(djs_zero, 0)
+        True
+    Notes:
+        - The function uses scipy.stats.entropy for numerical stability
+        - JS divergence is symmetric: D_JS(p || q) = D_JS(q || p)
+        - The function coverts input wave functions and density matrices to probability distributions  
+    References:
+        - Lin, J. (1991). Divergence measures based on the Shannon entropy.
+        - Cover, T. M., & Thomas, J. A. (2006). Elements of information theory.
+    """
+    # Ensure p and q are valid probability distributions
+    p = cast_to_pdf(p)
+    q = cast_to_pdf(q)
+
+    # Compute average distribution
+    m = 0.5 * (p + q)
+
+    # Compute JS divergence using KL divergences
+    djs = 0.5 * (entropy(p, qk=m) + entropy(q, qk=m))
+
+    return djs
 
 
 def FAF(rho, k=2):

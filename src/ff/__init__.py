@@ -85,10 +85,15 @@ from .ff_utils import (
 from .ff_distance_measures import (
     stabilizer_distribution,
     SRE,
+    FAF,
     renyi_entropy,
     linear_entropy,
     cov_distribution,
-    FAF,
+    total_variation_distance,
+    trace_distance,
+    relative_entropy,
+    jensen_shannon_divergence,
+    bhattacharyya_coeff,
 )
 
 # Random state generation functions from ff_random_states
@@ -172,10 +177,15 @@ __all__ = [
     # Distance measure functions from ff_distance_measures
     "stabilizer_distribution",
     "SRE",
+    "FAF",
     "renyi_entropy",
     "linear_entropy",
     "cov_distribution",
-    "FAF",
+    "total_variation_distance",
+    "trace_distance",
+    "relative_entropy",
+    "jensen_shannon_divergence",
+    "bhattacharyya_coeff",
     # Random state generation functions from ff_random_states
     "random_qubit_pure_state",
     "random_CHP_state",

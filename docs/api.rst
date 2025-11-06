@@ -42,6 +42,26 @@ and their proximity to classical, stabilizer, or free-fermion subspaces. Key mea
 - **Fermionic Anti-Flatness (FAF)**: Measures distance from free-fermion behavior
 - **General entropy measures**: Rényi entropy, linear entropy for probability distributions
 - **Stabilizer and covariance distributions**: Core probability distributions for analysis
+- **Distance measures**: Total variation distance, trace distance, relative entropy
+- **Divergence measures**: Jensen-Shannon divergence, Bhattacharyya coefficient
+
+Distance Measures Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+   :toctree: generated/
+
+   ff.ff_distance_measures.stabilizer_distribution
+   ff.ff_distance_measures.SRE
+   ff.ff_distance_measures.FAF
+   ff.ff_distance_measures.renyi_entropy
+   ff.ff_distance_measures.linear_entropy
+   ff.ff_distance_measures.cov_distribution
+   ff.ff_distance_measures.total_variation_distance
+   ff.ff_distance_measures.trace_distance
+   ff.ff_distance_measures.relative_entropy
+   ff.ff_distance_measures.jensen_shannon_divergence
+   ff.ff_distance_measures.bhattacharyya_coeff
 
 Random States Module (ff_random_states)
 ---------------------------------------
