@@ -74,9 +74,9 @@ def pf(A):
 
 
 def hf(A):
-    r"""Computes hafian via combinatorial formula.
+    r"""Computes hafnian via combinatorial formula.
 
-    Given :math:`A` of even dimension :math:`N = 2 n_e` we have the hafian as:
+    Given :math:`A` of even dimension :math:`N = 2 n_e` we have the hafnian as:
 
     .. math:: hf(A) =  \sum_{\sigma\in S_N}^{N!} W_\sigma(A)/(2^{n_e} n_e!)
 
