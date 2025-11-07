@@ -200,6 +200,7 @@ def SRE(rho, a=2):
     # Compute stabilizer distribution
     xi = stabilizer_distribution(rho)
 
+    # Appendix of Leone et al does not define SRE for completely mixed state
     if np.nonzero(xi)[0].size == 1:
         return 0.0
     
