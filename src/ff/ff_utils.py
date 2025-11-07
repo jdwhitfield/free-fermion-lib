@@ -187,7 +187,6 @@ def kron_plus(a, b):
     return np.block([[a, Z01], [Z01.T, b]])
 
 
-
 def cast_to_pdf(rho):
     """Casts input density matrix or wave function to a probability distribution."""
 
@@ -222,12 +221,12 @@ def cast_to_density_matrix(rho):
         l2_norm = np.linalg.norm(rho_flat, ord=2)
 
         # Determine if it's a wavefunction or probability distribution
-        if np.allclose(l2_norm, 1, rtol=1e-10, atol=1e-12):
+        if np.allclose(l2_norm, 1):
             # Treated as normalized wavefunction
             rho = rho.reshape(-1, 1)  # Ensure column vector
             rho = rho @ rho.conj().T
             #print("assuming wavefunction input")
-        elif np.allclose(l1_norm, 1, rtol=1e-10, atol=1e-12):
+        elif np.allclose(l1_norm, 1):
             # Treated as normalized probability distribution
             rho = np.diag(rho_flat)
             #print("assuming prob input")

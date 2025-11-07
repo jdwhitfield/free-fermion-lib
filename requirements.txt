@@ -1,6 +1,7 @@
 # Core scientific computing dependencies
 numpy>=1.20.0
 scipy>=1.7.0
+stim>=1.0.0
 
 # Graph theory and visualization
 networkx>=2.6.0

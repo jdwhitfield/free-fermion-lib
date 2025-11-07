@@ -31,12 +31,6 @@ from .ff_lib import (
 )
 from .ff_utils import clean
 
-# Optional dependency handling
-try:
-    import stim
-    STIM_AVAILABLE = True
-except ImportError:
-    STIM_AVAILABLE = False
 
 
 def random_qubit_pure_state(n, seed=None):
@@ -138,13 +132,8 @@ def random_CHP_state(n_qubits):
         - The generated states are uniformly distributed over the stabilizer
           state space
     """
-    # Check if stim is available
-    if not STIM_AVAILABLE:
-        raise ImportError(
-            "The 'stim' package is required for random_CHP_state(). "
-            "Install it with: pip install stim"
-        )
-
+    import stim
+    
     # Input validation
     if not isinstance(n_qubits, int):
         raise TypeError(f"Number of qubits must be an integer, got {type(n_qubits).__name__}")
