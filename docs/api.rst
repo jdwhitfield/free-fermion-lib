@@ -225,3 +225,5 @@ Utility Functions
    ff.ff_utils.formatted_output
    ff.ff_utils.generate_random_bitstring
    ff.ff_utils.kron_plus
+   ff.partial_trace_over_1
+   ff.partial_trace_over_2

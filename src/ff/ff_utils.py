@@ -337,3 +337,122 @@ def analyze_pdf(rho, name=None, stem=True):
     
     # Note: Function does not call plt.show() to allow user control
     return
+
+
+def partial_trace_diagblocksum(AB,d):
+    r"""
+    
+    This function implements the partial trace using a block matrix approach, 
+    where the composite matrix AB is viewed as a :math:`d \times d` array 
+    of :math:`d_2 \times d_2` blocks, and sum of the diagonal blocks gives the
+    partial trace result.
+
+    Args:
+        AB: Any composite matrix over space :math:`H_1 \otimes H_2`.
+        d: The dimension of the reduced state. Must be a positive integer such 
+        that D is divisible by :math:`d`, where D is the dimension of the 
+        composite system AB.
+
+    Returns:
+        B : the reduced matrix of subsystem B with shape :math:` d\times d `.
+        
+    Notes
+    -----
+    - The dimension of subsystem A is automatically computed as :math:`d_1 = D/d`
+    - The composite system dimension D must be exactly divisible by :math:`d`
+    - This is the partial trace over subsystem A.
+
+    Mathematical Details
+    --------------------
+    The reduced density matrix A is computed as:
+    
+    .. math::
+        A = \sum_j AB_{j,j}
+    
+    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d \times d`.
+    """
+
+    D = AB.shape[0]
+    assert int(D/d) == D/d, "d_out must divide D"
+    d2 = int(D/d)
+    
+    A = np.zeros((d,d),dtype=complex)
+    #sum the [d x d] boxes on diagonal
+    for j in range(d2):
+        col_idx = j
+        row_idx = j
+
+        j0 = row_idx*d
+        j1 = j0 + d
+
+        i0 = col_idx*d
+        i1 = i0 + d
+
+
+        A += AB[i0:i1, j0:j1]
+    return A
+
+
+def partial_trace_blockTr(AB,d):
+    r"""
+    This function implements the partial trace using a block matrix approach, 
+    where the composite matrix AB is viewed as a :math:`d \times d` array 
+    of :math:`d_1 \times d_1` blocks, and the trace of each block gives the 
+    corresponding matrix element of the result matrix.
+
+    Args:
+        AB: Any composite matrix over space :math:`H_1 \otimes H_2`.
+        d: The dimension of the reduced state. Must be a positive integer such 
+        that D is divisible by :math:`d`, where D is the dimension of the 
+        composite system AB.
+
+    Returns:
+        A : the reduced matrix of subsystem A with shape :math:` d\times d `.
+        
+    Notes
+    -----
+    - The dimension of subsystem B is automatically computed as :math:`d_2 = D/d`
+    - The composite system dimension D must be exactly divisible by :math:`d`
+    - This is the partial trace over subsystem B.
+
+
+    Mathematical Details
+    --------------------
+    The reduced density matrix element :math:`(i,j)` is computed as:
+    
+    .. math::
+        B[i,j] = \text{Tr}(AB_{i,j})
+    
+    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d_1 \times d_1`.
+    """
+
+
+    D = AB.shape[0]
+
+    assert int(D/d) == D/d, "d must divide linear dim(AB)"
+    d1 = int(D/d)
+    
+
+    B = np.zeros((d,d),dtype=complex)
+
+    #find the [d1 x d1] boxes
+    #take their traces
+    #save to matrix B
+    for i in range(d):
+        for j in range(d):
+            col_idx = i
+            row_idx = j
+
+            i0 = col_idx*d1
+            i1 = i0 + d1
+
+            j0 = row_idx*d1
+            j1 = j0 + d1
+
+            B[i,j] = np.trace(AB[i0:i1, j0:j1])
+
+    #cast to real if possible
+    if np.allclose(B.imag, np.zeros_like(B)):
+        B = B.real
+
+    return B

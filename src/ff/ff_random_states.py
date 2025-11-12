@@ -31,6 +31,13 @@ from .ff_lib import (
 )
 from .ff_utils import clean
 
+# Check if stim package is available
+try:
+    import stim
+    STIM_AVAILABLE = True
+except ImportError:
+    STIM_AVAILABLE = False
+
 
 
 def random_qubit_pure_state(n, seed=None):
@@ -132,6 +139,12 @@ def random_CHP_state(n_qubits):
         - The generated states are uniformly distributed over the stabilizer
           state space
     """
+    if not STIM_AVAILABLE:
+        raise ImportError(
+            "The 'stim' package is required for generating Clifford states. "
+            "Please install it using: pip install stim"
+        )
+    
     import stim
     
     # Input validation

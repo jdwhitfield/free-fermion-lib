@@ -23,7 +23,7 @@ def read_requirements():
 
 setup(
     name="free-fermion-lib",
-    version="1.2.1",
+    version="1.2.2",
     author="James D. Whitfield",
     author_email="James.D.Whitfield@dartmouth.edu",
     description="A comprehensive Python library for free fermion systems",

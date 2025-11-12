@@ -79,6 +79,8 @@ from .ff_utils import (
     formatted_output,
     generate_random_bitstring,
     kron_plus,
+    partial_trace_blockTr as partial_trace_over_2,
+    partial_trace_diagblocksum as partial_trace_over_1,
 )
 
 # Distance measure functions from ff_distance_measures
@@ -174,6 +176,8 @@ __all__ = [
     "formatted_output",
     "generate_random_bitstring",
     "kron_plus",
+    "partial_trace_over_2",
+    "partial_trace_over_1",
     # Distance measure functions from ff_distance_measures
     "stabilizer_distribution",
     "SRE",

@@ -130,7 +130,7 @@ def pt(A):
     Returns:
         Permanent value (complex or real)
     """
-    A = np.matrix(A)
+    A = np.ndarray(A)
     n = len(A)
 
     perms = itertools.permutations(range(n))
@@ -162,7 +162,7 @@ def dt(A):
     Returns:
         Determinant value (complex or real)
     """
-    A = np.matrix(A)
+    A = np.ndarray(A)
     n = len(A)
 
     perms = itertools.permutations(range(n))

@@ -495,3 +495,367 @@ class TestPerformanceUtilities:
         except AttributeError:
             # Optimization utilities might not exist
             pass
+
+
+class TestPartialTraceFunctions:
+    """Test the partial_trace_diagblocksum and partial_trace_B functions"""
+    def test_which_is_which(self):
+        """Test to ensure partial trace is computed correctly for random matrices"""
+
+        np.random.seed(321)  # For reproducible tests
+
+        A = np.random.rand(4, 4)
+        B = np.diag(np.random.rand(4))
+
+        AB = np.kron(A, B)
+
+        rho2 = ff.partial_trace_over_1(AB, d=4)
+        rho1 = ff.partial_trace_over_2(AB, d=4)
+                
+        assert np.allclose(rho1, A*np.trace(B) ), "partial_trace_over_2 should trace out subsystem 2"
+        assert np.allclose(rho2, B*np.trace(A)), "partial_trace_over_1 should trace out subsystem 1"
+
+    def test_partial_trace_left_product_states(self):
+        """Test partial_trace_blockTr with separable (product) states"""
+        # Test with |0⟩_A ⊗ |0⟩_B
+        psi_A = np.array([1, 0])  # |0⟩
+        psi_B = np.array([1, 0])  # |0⟩
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        expected_B = np.outer(psi_B, psi_B.conj())
+        
+        assert np.allclose(rho_B, expected_B), "Should recover |0⟩⟨0| for subsystem B"
+        assert rho_B.shape == (2, 2), "Output should be 2×2 matrix"
+        
+        # Test with |1⟩_A ⊗ |+⟩_B where |+⟩ = (|0⟩ + |1⟩)/√2
+        psi_A = np.array([0, 1])  # |1⟩
+        psi_B = np.array([1, 1]) / np.sqrt(2)  # |+⟩
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        expected_B = np.outer(psi_B, psi_B.conj())
+
+        #rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        # print("Given rho_A:")
+        # print(np.outer(psi_A, psi_A.conj()))
+        # print("Given rho_B:")
+        # print(np.outer(psi_B, psi_B.conj()))
+        # print("rho_AB")
+        # print(rho_AB)
+        # print("Computed rho_A:")
+        # print(rho_A)
+        # print("Computed rho_B:")
+        # print(rho_B)
+        # print("expected:")
+        # print(expected_B)
+
+        assert np.allclose(rho_B, expected_B), "Should recover |+⟩⟨+| for subsystem B"
+
+    def test_partial_trace_right_product_states(self):
+        """Test partial_trace_diagblocksum with separable (product) states"""
+        # Test with |0⟩_A ⊗ |0⟩_B
+        psi_A = np.array([1, 0])  # |0⟩
+        psi_B = np.array([1, 0])  # |0⟩
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        expected_A = np.outer(psi_A, psi_A.conj())
+        
+        assert np.allclose(rho_A, expected_A), "Should recover |0⟩⟨0| for subsystem A"
+        assert rho_A.shape == (2, 2), "Output should be 2×2 matrix"
+        
+        # Test with |+⟩_A ⊗ |1⟩_B where |+⟩ = (|0⟩ + |1⟩)/√2
+        psi_A = np.array([1, 1]) / np.sqrt(2)  # |+⟩
+        psi_B = np.array([0, 1])  # |1⟩
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        expected_A = np.outer(psi_A, psi_A.conj())
+        
+        assert np.allclose(rho_A, expected_A), "Should recover |+⟩⟨+| for subsystem A"
+
+    def test_partial_trace_bell_states(self):
+        """Test partial traces with maximally entangled Bell states"""
+        # Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2
+        psi_bell = np.array([1, 0, 0, 1]) / np.sqrt(2)
+        rho_AB = np.outer(psi_bell, psi_bell.conj())
+        
+        # Both partial traces should give maximally mixed states
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        
+        expected_mixed = np.eye(2) / 2  # Maximally mixed state
+        
+        assert np.allclose(rho_A, expected_mixed), "Partial trace of Bell state should be maximally mixed"
+        assert np.allclose(rho_B, expected_mixed), "Partial trace of Bell state should be maximally mixed"
+        
+        # Test another Bell state |Ψ-⟩ = (|01⟩ - |10⟩)/√2
+        psi_bell2 = np.array([0, 1, -1, 0]) / np.sqrt(2)
+        rho_AB2 = np.outer(psi_bell2, psi_bell2.conj())
+        
+        rho_A2 = ff.partial_trace_over_2(rho_AB2, d=2)
+        rho_B2 = ff.partial_trace_over_1(rho_AB2, d=2)
+        
+        assert np.allclose(rho_A2, expected_mixed), "All Bell states give maximally mixed reduced states"
+        assert np.allclose(rho_B2, expected_mixed), "All Bell states give maximally mixed reduced states"
+
+    def test_partial_trace_different_dimensions(self):
+        """Test partial traces with different system dimensions"""
+        # Test 2×3 system (dA=2, dB=3)
+        np.random.seed(42)  # For reproducible tests
+        psi_A = np.random.randn(2) + 1j * np.random.randn(2)
+        psi_A = psi_A / np.linalg.norm(psi_A)
+        psi_B = np.random.randn(3) + 1j * np.random.randn(3)
+        psi_B = psi_B / np.linalg.norm(psi_B)
+        
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        rho_B = ff.partial_trace_over_1(rho_AB, d=3)
+        
+        expected_A = np.outer(psi_A, psi_A.conj())
+        expected_B = np.outer(psi_B, psi_B.conj())
+        
+        assert rho_A.shape == (2, 2), "Reduced state A should be 2×2"
+        assert rho_B.shape == (3, 3), "Reduced state B should be 3×3"
+        assert np.allclose(rho_A, expected_A), "Should recover original state A"
+        assert np.allclose(rho_B, expected_B), "Should recover original state B"
+        
+        # Test 3×2 system (dA=3, dB=2)
+        psi_A = np.random.randn(3) + 1j * np.random.randn(3)
+        psi_A = psi_A / np.linalg.norm(psi_A)
+        psi_B = np.random.randn(2) + 1j * np.random.randn(2)
+        psi_B = psi_B / np.linalg.norm(psi_B)
+        
+        psi_AB = np.kron(psi_A, psi_B)
+        rho_AB = np.outer(psi_AB, psi_AB.conj())
+        
+        rho_A = ff.partial_trace_over_2(rho_AB, d=3)
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        
+        expected_A = np.outer(psi_A, psi_A.conj())
+        expected_B = np.outer(psi_B, psi_B.conj())
+        
+        assert rho_A.shape == (3, 3), "Reduced state A should be 3×3"
+        assert rho_B.shape == (2, 2), "Reduced state B should be 2×2"
+        assert np.allclose(rho_A, expected_A), "Should recover original state A"
+        assert np.allclose(rho_B, expected_B), "Should recover original state B"
+
+    def test_partial_trace_identity_matrices(self):
+        """Test partial traces with identity matrices"""
+        # 4×4 identity (2⊗2 system)
+        I4 = np.eye(4)
+        
+        rho_A = ff.partial_trace_over_2(I4, d=2)
+        rho_B = ff.partial_trace_over_1(I4, d=2)
+        
+        expected = 2 * np.eye(2)  # Each reduced state should be 2*I
+        
+        assert np.allclose(rho_A, expected), "Partial trace of identity should be scaled identity"
+        assert np.allclose(rho_B, expected), "Partial trace of identity should be scaled identity"
+        
+        # 6×6 identity (2⊗3 system)
+        I6 = np.eye(6)
+        
+        rho_A = ff.partial_trace_over_2(I6, d=2)
+        rho_B = ff.partial_trace_over_1(I6, d=3)
+        
+        expected_A = 3 * np.eye(2)  # Trace over 3-dimensional system
+        expected_B = 2 * np.eye(3)  # Trace over 2-dimensional system
+        
+        assert np.allclose(rho_A, expected_A), "Partial trace should scale correctly"
+        assert np.allclose(rho_B, expected_B), "Partial trace should scale correctly"
+
+    def test_partial_trace_random_density_matrices(self):
+        """Test partial traces with random density matrices"""
+        np.random.seed(123)  # For reproducible tests
+        
+        # Generate random 4×4 density matrix
+        A = np.random.randn(4, 4) + 1j * np.random.randn(4, 4)
+        rho_AB = A @ A.conj().T
+        rho_AB = rho_AB / np.trace(rho_AB)  # Normalize
+        
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        
+        # Check dimensions
+        assert rho_A.shape == (2, 2), "Reduced state A should be 2×2"
+        assert rho_B.shape == (2, 2), "Reduced state B should be 2×2"
+        
+        # Check trace preservation
+        assert np.allclose(np.trace(rho_A), 1.0), "Trace should be preserved"
+        assert np.allclose(np.trace(rho_B), 1.0), "Trace should be preserved"
+        
+        # Check Hermiticity
+        assert np.allclose(rho_A, rho_A.conj().T), "Reduced state should be Hermitian"
+        assert np.allclose(rho_B, rho_B.conj().T), "Reduced state should be Hermitian"
+        
+        # Check positive semidefinite (eigenvalues ≥ 0)
+        eigs_A = np.linalg.eigvals(rho_A)
+        eigs_B = np.linalg.eigvals(rho_B)
+        assert np.all(eigs_A >= -1e-10), "Eigenvalues should be non-negative"
+        assert np.all(eigs_B >= -1e-10), "Eigenvalues should be non-negative"
+
+    def test_partial_trace_edge_cases(self):
+        """Test partial traces with edge cases"""
+        # Single qubit system (trivial case)
+        rho_1 = np.array([[0.7, 0.1], [0.1, 0.3]])
+        
+        # Tracing out a 1-dimensional "subsystem" should return the original matrix
+        rho_traced = ff.partial_trace_over_1(rho_1, d=2)
+        assert np.allclose(rho_traced, rho_1), "Single system should remain unchanged"
+        
+        # Larger system: 3×3 system
+        np.random.seed(456)
+        A = np.random.randn(9, 9) + 1j * np.random.randn(9, 9)
+        rho_large = A @ A.conj().T
+        rho_large = rho_large / np.trace(rho_large)
+        
+        rho_A = ff.partial_trace_over_2(rho_large, d=3)
+        rho_B = ff.partial_trace_over_1(rho_large, d=3)
+        
+        assert rho_A.shape == (3, 3), "Reduced state A should be 3x3"
+        assert rho_B.shape == (3, 3), "Reduced state B should be 3x3"
+        assert np.allclose(np.trace(rho_A), 1.0), "Trace should be preserved"
+        assert np.allclose(np.trace(rho_B), 1.0), "Trace should be preserved"
+
+    def test_partial_trace_consistency(self):
+        """Test consistency between partial_trace_A and partial_trace_B"""
+        np.random.seed(789)
+        
+        # Generate random 4×4 density matrix
+        A = np.random.randn(4, 4) + 1j * np.random.randn(4, 4)
+        rho_AB = A @ A.conj().T
+        rho_AB = rho_AB / np.trace(rho_AB)
+        
+        # Both functions should preserve trace
+        rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+        rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+        
+        assert np.allclose(np.trace(rho_A), np.trace(rho_B)), "Both partial traces should have same trace"
+        assert np.allclose(np.trace(rho_A), 1.0), "Trace should be 1"
+        
+        # For symmetric systems, swapping A and B should give same result
+        # Create symmetric density matrix
+        rho_symmetric = np.array([[0.25, 0.1, 0.1, 0.05],
+                                 [0.1, 0.25, 0.05, 0.1],
+                                 [0.1, 0.05, 0.25, 0.1],
+                                 [0.05, 0.1, 0.1, 0.25]])
+        
+        rho_A_sym = ff.partial_trace_over_2(rho_symmetric, d=2)
+        rho_B_sym = ff.partial_trace_over_1(rho_symmetric, d=2)
+        
+        # For this particular symmetric matrix, both reduced states should be identical
+        assert np.allclose(rho_A_sym, rho_B_sym), "Symmetric system should give identical reduced states"
+
+    def test_partial_trace_known_analytical_results(self):
+        """Test partial traces with known analytical results"""
+        # Test case 1: Werner state ρ = p|Φ+⟩⟨Φ+| + (1-p)I/4
+        p = 0.7
+        phi_plus = np.array([1, 0, 0, 1]) / np.sqrt(2)
+        rho_bell = np.outer(phi_plus, phi_plus.conj())
+        rho_werner = p * rho_bell + (1 - p) * np.eye(4) / 4
+        
+        rho_A = ff.partial_trace_over_2(rho_werner, d=2)
+        rho_B = ff.partial_trace_over_1(rho_werner, d=2)
+        
+        # Analytical result: both reduced states should be (1/2)*I
+        expected = 0.5 * np.eye(2)
+        
+        assert np.allclose(rho_A, expected, atol=1e-10), "Werner state should give maximally mixed reduced states"
+        assert np.allclose(rho_B, expected, atol=1e-10), "Werner state should give maximally mixed reduced states"
+        
+        # Test case 2: Known 2×3 example
+        # Create a specific 6×6 density matrix with known partial traces
+        rho_23 = np.zeros((6, 6), dtype=complex)
+        rho_23[0, 0] = 0.3  # |00⟩⟨00|
+        rho_23[1, 1] = 0.2  # |01⟩⟨01|
+        rho_23[2, 2] = 0.1  # |02⟩⟨02|
+        rho_23[3, 3] = 0.2  # |10⟩⟨10|
+        rho_23[4, 4] = 0.1  # |11⟩⟨11|
+        rho_23[5, 5] = 0.1  # |12⟩⟨12|
+        
+        rho_A_23 = ff.partial_trace_over_2(rho_23, d=2)
+        rho_B_23 = ff.partial_trace_over_1(rho_23, d=3)
+        
+        # Analytical results
+        expected_A = np.array([[0.6, 0], [0, 0.4]])  # Tr_B(ρ)
+        expected_B = np.array([[0.5, 0, 0], [0, 0.3, 0], [0, 0, 0.2]])  # Tr_A(ρ)
+        
+        assert np.allclose(rho_A_23, expected_A), "Known 2×3 example should match analytical result"
+        assert np.allclose(rho_B_23, expected_B), "Known 2×3 example should match analytical result"
+
+    def test_partial_trace_properties_verification(self):
+        """Test mathematical properties of partial trace operations"""
+        np.random.seed(999)
+        
+        # Generate multiple random density matrices for comprehensive testing
+        for _ in range(5):
+            # Random 4×4 density matrix
+            A = np.random.randn(4, 4) + 1j * np.random.randn(4, 4)
+            rho_AB = A @ A.conj().T
+            rho_AB = rho_AB / np.trace(rho_AB)
+            
+            rho_A = ff.partial_trace_over_2(rho_AB, d=2)
+            rho_B = ff.partial_trace_over_1(rho_AB, d=2)
+            
+            # Property 1: Trace preservation
+            assert np.allclose(np.trace(rho_A), 1.0, atol=1e-12), "Trace should be preserved"
+            assert np.allclose(np.trace(rho_B), 1.0, atol=1e-12), "Trace should be preserved"
+            
+            # Property 2: Hermiticity
+            assert np.allclose(rho_A, rho_A.conj().T, atol=1e-12), "Reduced state should be Hermitian"
+            assert np.allclose(rho_B, rho_B.conj().T, atol=1e-12), "Reduced state should be Hermitian"
+            
+            # Property 3: Positive semidefinite
+            eigs_A = np.linalg.eigvals(rho_A)
+            eigs_B = np.linalg.eigvals(rho_B)
+            assert np.all(eigs_A.real >= -1e-12), "Eigenvalues should be non-negative"
+            assert np.all(eigs_B.real >= -1e-12), "Eigenvalues should be non-negative"
+            assert np.all(np.abs(eigs_A.imag) < 1e-12), "Eigenvalues should be real"
+            assert np.all(np.abs(eigs_B.imag) < 1e-12), "Eigenvalues should be real"
+            
+            # Property 4: Dimension correctness
+            assert rho_A.shape == (2, 2), "Reduced state A should have correct dimensions"
+            assert rho_B.shape == (2, 2), "Reduced state B should have correct dimensions"
+
+    def test_partial_trace_linearity(self):
+        """Test linearity of partial trace operations"""
+        np.random.seed(111)
+        
+        # Generate two random density matrices
+        A1 = np.random.randn(4, 4) + 1j * np.random.randn(4, 4)
+        rho1 = A1 @ A1.conj().T
+        rho1 = rho1 / np.trace(rho1)
+        
+        A2 = np.random.randn(4, 4) + 1j * np.random.randn(4, 4)
+        rho2 = A2 @ A2.conj().T
+        rho2 = rho2 / np.trace(rho2)
+        
+        # Test linearity: Tr_A(αρ1 + βρ2) = αTr_A(ρ1) + βTr_A(ρ2)
+        alpha, beta = 0.3, 0.7
+        rho_combined = alpha * rho1 + beta * rho2
+        
+        # Partial traces of individual matrices
+        rho1_A = ff.partial_trace_over_2(rho1, d=2)
+        rho2_A = ff.partial_trace_over_2(rho2, d=2)
+        rho1_B = ff.partial_trace_over_1(rho1, d=2)
+        rho2_B = ff.partial_trace_over_1(rho2, d=2)
+        
+        # Partial traces of combined matrix
+        rho_combined_A = ff.partial_trace_over_2(rho_combined, d=2)
+        rho_combined_B = ff.partial_trace_over_1(rho_combined, d=2)
+        
+        # Check linearity
+        expected_A = alpha * rho1_A + beta * rho2_A
+        expected_B = alpha * rho1_B + beta * rho2_B
+        
+        assert np.allclose(rho_combined_A, expected_A, atol=1e-12), "Partial trace should be linear"
+        assert np.allclose(rho_combined_B, expected_B, atol=1e-12), "Partial trace should be linear"
