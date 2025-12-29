@@ -28,8 +28,7 @@ import numpy as np
 from scipy.linalg import schur
 from scipy.stats import entropy
 
-from .ff_lib import (compute_cov_matrix, generate_pauli_group,
-                     jordan_wigner_majoranas)
+from .ff_lib import compute_cov_matrix, generate_pauli_group, jordan_wigner_majoranas
 from .ff_utils import cast_to_density_matrix, cast_to_pdf, clean
 
 
