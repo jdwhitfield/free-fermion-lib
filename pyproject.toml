@@ -67,6 +67,7 @@ Repository = "https://github.com/jdwhitfield/free-fermion-lib"
 where = ["src"]
 
 [tool.isort]  
+profile = "black"
 skip = ["__init__.py"]
 
 [tool.setuptools.package-dir]
