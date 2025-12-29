@@ -162,7 +162,8 @@ def plot_graph_with_edge_weights(A, matching=None, title=None):
 
     if matching is not None:
         # Highlight the matching edges
-        nx.draw_networkx_edges(G, pos, edgelist=matching, edge_color="red", width=2)
+        nx.draw_networkx_edges(
+            G, pos, edgelist=matching, edge_color="red", width=2)
 
     # title of plot
     if title is not None:
@@ -618,7 +619,8 @@ def pfo_algorithm(graph, verbose=False):
 
             if verbose:
                 plot_planar_embedding(
-                    graph, np.real(orientation), title="Face {}: {}".format(leaf, face)
+                    graph, np.real(orientation),
+                    title="Face {}: {}".format(leaf, face)
                 )
 
     if np.sum(np.sum(np.imag(orientation))) > 1e-16:

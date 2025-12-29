@@ -21,7 +21,7 @@ import numpy as np
 from scipy.linalg import expm, logm, schur
 from scipy.stats import special_ortho_group
 
-from .ff_utils import _print, kron_plus
+from .ff_utils import kron_plus  # _print,
 
 
 def permutation_to_matrix(permutation):
@@ -117,15 +117,19 @@ def generate_pauli_group(n, verbose=False):
         (4, 4)
 
     Notes:
-        - The function uses the existing pauli_matrices() function for consistency
-        - Memory usage scales as O(4^n * 4^n) = O(16^n), so use with caution for large n
+        - The function uses the existing pauli_matrices() function for
+            consistency
+        - Memory usage scales as O(4^n * 4^n) = O(16^n), so use with caution
+            for large n
         - For n > 4, consider using sparse representations or symbolic methods
-        - The ordering follows itertools.product convention: rightmost index varies fastest
+        - The ordering follows itertools.product convention: rightmost index
+            varies fastest
         - Verbose output shows Pauli strings in standard notation (I, X, Y, Z)
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(
+            f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -415,7 +419,8 @@ def random_FF_rotation(n_sites, seed=None, returnH=False, returnOrb=False):
         n_sites: The number of sites
         seed: Random seed for reproducibility (default: None)
         returnH: If True, return the generator matrix instead (default: False)
-        returnOrb: If True, return the orbital rotation matrix C (default: False)
+        returnOrb: If True, return the orbital rotation matrix C
+                   (default: False)
 
     Returns:
         A random free fermion rotation matrix of dimension 2*N for N sites
@@ -445,11 +450,13 @@ def random_FF_rotation(n_sites, seed=None, returnH=False, returnOrb=False):
     return expm(-1j * G_op)  # Compute the unitary operator
 
 
-def random_FF_state(n_sites, fixedN=False, seed=None, returnH=False, pure=False):
-    """Generate a Haar random free fermion state using random symplectic rotations.
+def random_FF_state(n_sites, fixedN=False,
+                    seed=None, returnH=False, pure=False):
+    """Generate Haar random free fermion state using symplectic rotations.
 
     This function generates free-fermion states that are uniformly distributed
-    over the space of free-fermion states using Haar random symplectic transformations.
+    over the space of free-fermion states using Haar random symplectic
+    transformations.
 
     Args:
         n_sites: The number of sites
@@ -459,8 +466,8 @@ def random_FF_state(n_sites, fixedN=False, seed=None, returnH=False, pure=False)
                           rho (default: False)
         pure: If True, return a pure state (default: False)
     Returns:
-        A normalized Haar random free fermion state, rho. If returnH is True, also
-        returns the generator matrix H.
+        A normalized Haar random free fermion state, rho. If returnH is True,
+        also returns the generator matrix H.
     """
     if seed is not None:
         np.random.seed(seed)
@@ -482,7 +489,8 @@ def random_FF_state(n_sites, fixedN=False, seed=None, returnH=False, pure=False)
         else:
             return psi
 
-    # For mixed states, use thermal-like distribution with Haar random Hamiltonian
+    # For mixed states, use thermal-like distribution with Haar random
+    # Hamiltonian
     if fixedN:
         # For particle number preserving case, use simpler approach
         H = random_H_generator(n_sites, fixedN=True, seed=seed)
@@ -519,8 +527,10 @@ def random_H_generator(n_sites, fixedN=False, seed=None):
     if seed is not None:
         np.random.seed(seed)
 
-    A = np.random.randn(n_sites, n_sites) + 1j * np.random.randn(n_sites, n_sites)
-    Z = np.random.randn(n_sites, n_sites) + 1j * np.random.randn(n_sites, n_sites)
+    A = np.random.randn(n_sites, n_sites)
+    A = A + 1j * np.random.randn(n_sites, n_sites)
+    Z = np.random.randn(n_sites, n_sites)
+    Z = Z + 1j * np.random.randn(n_sites, n_sites)
     A = A + A.conj().T  # make A Hermitian
     Z = Z - Z.T  # make Z skew-symmetric
 
@@ -764,7 +774,7 @@ def build_op(n_sites, R, alphas, verbose=None, direct=False):
         The N-body Hamiltonian operator as a matrix
     """
     if R.shape[0] != 2 * n_sites or R.shape[1] != 2 * n_sites:
-        print("Use `build_H(n_sites,A,np.zeros_like(A))`", "to format input correctly")
+        print("R incorrectly formmatted. Use `build_H` to create R")
 
     # N-body operators
     R_op = np.zeros_like(alphas[0])
@@ -818,7 +828,7 @@ def compute_cov_matrix(rho, n_sites=None, alphas=None):
 
 
 def correlation_matrix(rho):
-    """
+    r"""
     Calculates the following two-point correlation matrix
 
     .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle
@@ -840,7 +850,7 @@ def correlation_matrix(rho):
 
 
 def compute_2corr_matrix(rho, n_sites, alphas=None, conjugation=None):
-    """
+    r"""
     Calculate the two-point correlation matrix
 
     .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle
@@ -967,7 +977,8 @@ def is_matchgate(M, verbose=False):
     if np.allclose(det_inner, det_corner):
         if verbose:
             print(
-                "Satisfies the matchgate condition, det1=det2=", np.round(det_inner, 4)
+                "Satisfies the matchgate condition, det1=det2=",
+                np.round(det_inner, 4)
             )
         return True
     else:
