@@ -34,6 +34,7 @@ from .ff_utils import clean, cast_to_density_matrix
 # Check if stim package is available
 try:
     import stim
+
     STIM_AVAILABLE = True
 except ImportError:
     STIM_AVAILABLE = False
@@ -75,7 +76,7 @@ def random_qubit_state(n, seed=None):
     # Input validation
     if not isinstance(n, int):
         raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
-    
+
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
 
@@ -86,7 +87,7 @@ def random_qubit_state(n, seed=None):
     s = np.random.dirichlet(np.ones(2**n))
 
     # Apply Haar random unitary to random pdf
-    U = unitary_group.rvs(dim=2 ** n)
+    U = unitary_group.rvs(dim=2**n)
 
     rho = cast_to_density_matrix(U @ np.diag(s) @ U.conj().T)
 
@@ -135,7 +136,7 @@ def random_qubit_pure_state(n, seed=None):
     # Input validation
     if not isinstance(n, int):
         raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
-    
+
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
 
@@ -143,7 +144,7 @@ def random_qubit_pure_state(n, seed=None):
         np.random.seed(seed)
 
     # For pure states, apply Haar random unitary to vacuum state
-    U = unitary_group.rvs(dim=2 ** n)
+    U = unitary_group.rvs(dim=2**n)
     zero_state = np.zeros((2**n, 1), dtype=complex)
 
     zero_state[0, 0] = 1  # Set the first element to 1 (vacuum state / 0000..0)
@@ -197,16 +198,17 @@ def random_CHP_state(n_qubits):
             "The 'stim' package is required for generating Clifford states. "
             "Please install it using: pip install stim"
         )
-    
+
     import stim
-    
+
     # Input validation
     if not isinstance(n_qubits, int):
-        raise TypeError(f"Number of qubits must be an integer, got {type(n_qubits).__name__}")
-    
+        raise TypeError(
+            f"Number of qubits must be an integer, got {type(n_qubits).__name__}"
+        )
+
     if n_qubits <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n_qubits}")
-
 
     t = stim.Tableau.random(n_qubits)
 
@@ -256,8 +258,10 @@ def random_FF_state_randH(n_sites, seed=None):
     """
     # Input validation
     if not isinstance(n_sites, int):
-        raise TypeError(f"Number of sites must be an integer, got {type(n_sites).__name__}")
-    
+        raise TypeError(
+            f"Number of sites must be an integer, got {type(n_sites).__name__}"
+        )
+
     if n_sites <= 0:
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
@@ -269,7 +273,7 @@ def random_FF_state_randH(n_sites, seed=None):
     A = A + A.conj().T
     Z = Z - Z.T
 
-    rescale = 2**(2 - n_sites)
+    rescale = 2 ** (2 - n_sites)
     G = build_V(n_sites, A, Z) * rescale
 
     H_op = build_op(n_sites, G, jordan_wigner_alphas(n_sites), direct=True)
@@ -321,8 +325,10 @@ def random_FF_state_rotPDF(n_sites, returnS=False, seed=None):
     """
     # Input validation
     if not isinstance(n_sites, int):
-        raise TypeError(f"Number of sites must be an integer, got {type(n_sites).__name__}")
-    
+        raise TypeError(
+            f"Number of sites must be an integer, got {type(n_sites).__name__}"
+        )
+
     if n_sites <= 0:
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
@@ -331,7 +337,9 @@ def random_FF_state_rotPDF(n_sites, returnS=False, seed=None):
 
     W_op = random_FF_rotation(n_sites)
 
-    assert np.allclose(W_op @ W_op.conj().T, np.eye(2**n_sites)), "Rotation is not unitary"
+    assert np.allclose(
+        W_op @ W_op.conj().T, np.eye(2**n_sites)
+    ), "Rotation is not unitary"
 
     s = np.random.dirichlet(np.ones(2**n_sites))
 
@@ -378,8 +386,10 @@ def random_FF_pure_state_W0(n_sites, seed=None):
     """
     # Input validation
     if not isinstance(n_sites, int):
-        raise TypeError(f"Number of sites must be an integer, got {type(n_sites).__name__}")
-    
+        raise TypeError(
+            f"Number of sites must be an integer, got {type(n_sites).__name__}"
+        )
+
     if n_sites <= 0:
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
@@ -442,8 +452,10 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
     """
     # Input validation
     if not isinstance(n_sites, int):
-        raise TypeError(f"Number of sites must be an integer, got {type(n_sites).__name__}")
-    
+        raise TypeError(
+            f"Number of sites must be an integer, got {type(n_sites).__name__}"
+        )
+
     if n_sites <= 0:
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
@@ -516,8 +528,10 @@ def random_FF_pure_state_CN(n_sites, seed=None):
     """
     # Input validation
     if not isinstance(n_sites, int):
-        raise TypeError(f"Number of sites must be an integer, got {type(n_sites).__name__}")
-    
+        raise TypeError(
+            f"Number of sites must be an integer, got {type(n_sites).__name__}"
+        )
+
     if n_sites <= 0:
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
@@ -529,9 +543,13 @@ def random_FF_pure_state_CN(n_sites, seed=None):
     K = np.append(np.ones(N), (np.zeros(n_sites - N)))
 
     # random orbital rotation respecting the antisymmetry of the given operators
-    C = random_FF_rotation(n_sites, seed=seed + 1 if seed is not None else None, returnOrb=True)
+    C = random_FF_rotation(
+        n_sites, seed=seed + 1 if seed is not None else None, returnOrb=True
+    )
 
-    assert np.allclose(C @ C.conj().T, np.eye(2 * n_sites)), "Orbital rotation is not unitary"
+    assert np.allclose(
+        C @ C.conj().T, np.eye(2 * n_sites)
+    ), "Orbital rotation is not unitary"
 
     rand_alphas = rotate_operators(C, jordan_wigner_alphas(n_sites))
 
@@ -540,7 +558,7 @@ def random_FF_pure_state_CN(n_sites, seed=None):
     Sr = compute_algebra_S(rand_alphas)
     assert np.allclose(S, Sr), "Algebra structure not preserved under rotation"
 
-    #Distill the vaccuum state
+    # Distill the vaccuum state
     Y = np.random.randn(2**n_sites, 1)
     Y = Y / np.linalg.norm(Y)
 
@@ -548,7 +566,7 @@ def random_FF_pure_state_CN(n_sites, seed=None):
 
     PP = Id
     for i in range(n_sites):
-        Pi = (Id - rand_alphas[i] @ rand_alphas[i].conj().T)
+        Pi = Id - rand_alphas[i] @ rand_alphas[i].conj().T
         PP = PP @ Pi
 
     vac = PP @ Y
@@ -602,7 +620,7 @@ def get_orthogonal_vectors(v):
     v = np.asarray(v)
     if len(v.shape) == 1:
         v = v.reshape(-1, 1)
-    
+
     n = v.shape[0]
 
     if n < 2:
@@ -652,12 +670,12 @@ def build_unitary_path(w, v):
         >>> w = np.array([[1], [0], [0]])
         >>> v = np.array([[0], [1], [0]])
         >>> path = build_unitary_path(w, v)
-        >>> 
+        >>>
         >>> # Evaluate at t=0 (should be close to w)
         >>> start = path(0.0)
         >>> print(np.allclose(start, w / np.linalg.norm(w)))
         True
-        >>> 
+        >>>
         >>> # Evaluate at t=1 (should be close to v)
         >>> end = path(1.0)
         >>> print(np.allclose(end, v / np.linalg.norm(v)))
@@ -671,12 +689,12 @@ def build_unitary_path(w, v):
     # Normalize the vectors
     w = np.asarray(w)
     v = np.asarray(v)
-    
+
     if len(w.shape) == 1:
         w = w.reshape(-1, 1)
     if len(v.shape) == 1:
         v = v.reshape(-1, 1)
-    
+
     w = w / np.linalg.norm(w)
     v = v / np.linalg.norm(v)
 
@@ -695,7 +713,7 @@ def build_unitary_path(w, v):
 
     assert np.allclose(W @ W.conj().T, np.eye(n)), "W is not unitary"
     assert np.allclose(V @ V.conj().T, np.eye(n)), "V is not unitary"
-    
+
     if not np.allclose(U @ U.conj().T, np.eye(n)):
         # project to nearest unitary
         V_svd, _, Wh = np.linalg.svd(U)
@@ -706,7 +724,9 @@ def build_unitary_path(w, v):
     # Compute the Hermitian matrix of U
     H = 1j * logm(U)
 
-    assert np.allclose(H - H.conj().T, 0), f"H is not Hermitian: {clean(H - H.conj().T, 13)}"
+    assert np.allclose(
+        H - H.conj().T, 0
+    ), f"H is not Hermitian: {clean(H - H.conj().T, 13)}"
 
     path = lambda t: expm(-1j * H * t) @ w
 
@@ -737,12 +757,12 @@ def build_linear_path(w, v):
         >>> w = np.array([[1], [0], [0]])
         >>> v = np.array([[0], [1], [0]])
         >>> path = build_linear_path(w, v)
-        >>> 
+        >>>
         >>> # Evaluate at s=0 (should be close to w)
         >>> start = path(0.0)
         >>> print(np.allclose(start, w / np.linalg.norm(w)))
         True
-        >>> 
+        >>>
         >>> # Evaluate at s=1 (should be close to v)
         >>> end = path(1.0)
         >>> print(np.allclose(end, v / np.linalg.norm(v)))
@@ -756,15 +776,15 @@ def build_linear_path(w, v):
     # Normalize the vectors
     w = np.asarray(w)
     v = np.asarray(v)
-    
+
     if len(w.shape) == 1:
         w = w.reshape(-1, 1)
     if len(v.shape) == 1:
         v = v.reshape(-1, 1)
-        
+
     w = w / np.linalg.norm(w)
     v = v / np.linalg.norm(v)
-    
+
     path = lambda s: (s * v + (1 - s) * w) / np.linalg.norm(s * v + (1 - s) * w)
 
     return path

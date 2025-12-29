@@ -57,30 +57,30 @@ def pauli_matrices():
 def generate_pauli_group(n, verbose=False):
     """
     Generate all 4^n elements of the Pauli group for n qubits.
-    
+
     This function generates all possible tensor products of the Pauli matrices
     (I, X, Y, Z) for n qubits, creating the complete Pauli group of order 4^n.
     Each element is a 2^n x 2^n matrix representing a Pauli operator acting
     on the n-qubit Hilbert space.
-    
+
     The Pauli group is fundamental in quantum error correction, quantum
     computing, and stabilizer formalism. It consists of all n-fold tensor
     products of single-qubit Pauli operators.
-    
+
     Args:
         n (int): The number of qubits. Must be a positive integer.
         verbose (bool): If True, print the Pauli string name for each operator
                        as it's generated (default: False).
-        
+
     Returns:
         list: A list of 4^n numpy arrays, each of shape (2^n, 2^n),
               representing all Pauli operators for n qubits. The operators
               are ordered lexicographically by their tensor product structure.
-              
+
     Raises:
         TypeError: If n is not an integer.
         ValueError: If n is not positive.
-        
+
     Examples:
         >>> # Single qubit case (n=1)
         >>> pauli_1 = generate_pauli_group(1)
@@ -92,7 +92,7 @@ def generate_pauli_group(n, verbose=False):
         >>> pauli_1[1]  # Pauli-X
         array([[0, 1],
                [1, 0]])
-               
+
         >>> # Two qubit case (n=2) with verbose output
         >>> pauli_2 = generate_pauli_group(2, verbose=True)
         II
@@ -115,7 +115,7 @@ def generate_pauli_group(n, verbose=False):
         16
         >>> pauli_2[0].shape
         (4, 4)
-        
+
     Notes:
         - The function uses the existing pauli_matrices() function for consistency
         - Memory usage scales as O(4^n * 4^n) = O(16^n), so use with caution for large n
@@ -126,32 +126,32 @@ def generate_pauli_group(n, verbose=False):
     # Input validation
     if not isinstance(n, int):
         raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
-    
+
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
-        
+
     # Use existing pauli_matrices function for consistency
     sigma_x, sigma_y, sigma_z = pauli_matrices()
     identity = np.eye(2, dtype=complex)
     paulis = [identity, sigma_x, sigma_y, sigma_z]
-    pauli_names = ['I', 'X', 'Y', 'Z']
-    
+    pauli_names = ["I", "X", "Y", "Z"]
+
     # Import itertools.product for generating all combinations
     from itertools import product as itertools_product
-    
+
     pauli_group = []
-    
+
     # Generate all 4^n combinations of Pauli matrices
     for pauli_combination in itertools_product(paulis, repeat=n):
         # Start with the first Pauli matrix
         tensor_product = pauli_combination[0]
-        
+
         # Compute tensor product for remaining matrices
         for i in range(1, n):
             tensor_product = np.kron(tensor_product, pauli_combination[i])
-            
+
         pauli_group.append(tensor_product)
-        
+
         # Print Pauli string name if verbose mode is enabled
         if verbose:
             # Get corresponding names for this combination
@@ -163,7 +163,7 @@ def generate_pauli_group(n, verbose=False):
                         pauli_string += pauli_names[idx]
                         break
             print(pauli_string)
-    
+
     return pauli_group
 
 
@@ -821,9 +821,9 @@ def correlation_matrix(rho):
     """
     Calculates the following two-point correlation matrix
 
-    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle 
+    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle
     .. math:: \Gamma_{ij} = Tr[\rho \alpha_i \alpha_j]
-    
+
     for JW fermionic operators in the [a^+ a] ordering
 
     Args:
@@ -843,9 +843,9 @@ def compute_2corr_matrix(rho, n_sites, alphas=None, conjugation=None):
     """
     Calculate the two-point correlation matrix
 
-    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle 
+    .. math:: \Gamma = \langle \vec \alpha \vec \alpha ^t \rangle
     .. math:: \Gamma_{ij} = Tr[\rho \alpha_i \alpha_j]
-    
+
     By changing the input conjugation parameter, this function also computes
     P = ⟨vec \alpha vec α†⟩ (conjugation == T)
     η = ⟨vec \alpha^\dagger vec α^t⟩ (conjugation < 0)

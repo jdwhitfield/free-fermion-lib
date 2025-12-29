@@ -193,8 +193,8 @@ def cast_to_pdf(rho):
     rho = cast_to_density_matrix(np.asarray(rho, dtype=complex))
     pdf = np.diag(rho)
 
-    #cast to real if possible
-    if np.allclose(pdf,pdf.real):
+    # cast to real if possible
+    if np.allclose(pdf, pdf.real):
         pdf = pdf.real
     else:
         raise ValueError("Probability distribution has non-negligible imaginary part")
@@ -225,60 +225,64 @@ def cast_to_density_matrix(rho):
             # Treated as normalized wavefunction
             rho = rho.reshape(-1, 1)  # Ensure column vector
             rho = rho @ rho.conj().T
-            #print("assuming wavefunction input")
+            # print("assuming wavefunction input")
         elif np.allclose(l1_norm, 1):
             # Treated as normalized probability distribution
             rho = np.diag(rho_flat)
-            #print("assuming prob input")
+            # print("assuming prob input")
         else:
             raise ValueError(
                 f"Vector input must be normalized (L1 or L2 norm ≈ 1). "
                 f"Got L1={l1_norm:.6f}, L2={l2_norm:.6f}"
             )
-    
+
     # Validate density matrix properties
-    if len(rho.shape) != 2 or rho.shape[0] != rho.shape[1]: # or not np.allclose(np.trace(rho),1):
+    if (
+        len(rho.shape) != 2 or rho.shape[0] != rho.shape[1]
+    ):  # or not np.allclose(np.trace(rho),1):
         raise ValueError("Generated state is not square")
     assert np.allclose(1, np.trace(rho)), "Generated state is not normalized"
-    assert np.allclose(rho,rho.conj().T), "Generated state is not hermitian"
+    assert np.allclose(rho, rho.conj().T), "Generated state is not hermitian"
     ## MAY NEED TO BE REMOVED FOR SPEED
-    assert np.all(np.linalg.eigvalsh(rho) >= 0), "Generated state is not positive semidefinite"
+    assert np.all(
+        np.linalg.eigvalsh(rho) >= 0
+    ), "Generated state is not positive semidefinite"
 
     return rho
 
 
 def analyze_pdf(rho, name=None, stem=True):
     """Population analysis and visualization for probability distributions.
-    
-    Analyzes and visualizes probability distributions from density matrices or 
+
+    Analyzes and visualizes probability distributions from density matrices or
     wavefunctions. Computes both diagonal elements and eigenvalues of the density
     matrix and displays them with optional logarithmic scaling.
-    
+
     Args:
         rho (numpy.ndarray): Density matrix, wavefunction, or probability distribution.
             - If 2D square matrix: treated as density matrix
             - If 1D array or column vector: interpreted based on normalization
                 - L2 norm ≈ 1: treated as normalized wavefunction
                 - L1 norm ≈ 1: treated as normalized probability distribution
-        name (str, optional): Name for the plot title. If provided, will appear 
+        name (str, optional): Name for the plot title. If provided, will appear
             as "Population analysis of {name}". Default is None.
         stem (bool, optional): Whether to use stem plot (True) or line plot (False).
             Default is True.
-    
+
     Returns:
         None: Function creates a matplotlib plot but does not return values.
-        
+
     Raises:
         ValueError: If input array has invalid dimensions or normalization.
         TypeError: If input is not a numpy array or array-like object.
-        
+
     Notes:
         - The function automatically converts wavefunctions to density matrices
         - Diagonal elements are plotted in red, eigenvalues in black dashed
         - Y-axis uses logarithmic scaling to highlight small probabilities
         - Small numerical values are cleaned using the FF library clean() function
         - Plot is created but not displayed; user must call plt.show() separately
-        
+
     Examples:
         >>> import numpy as np
         >>> import matplotlib.pyplot as plt
@@ -286,7 +290,7 @@ def analyze_pdf(rho, name=None, stem=True):
         >>> rho = np.array([[0.7, 0.1], [0.1, 0.3]])
         >>> analyze_pdf(rho, name="2-level system")
         >>> plt.show()
-        
+
         >>> # Analyze a wavefunction
         >>> psi = np.array([1/np.sqrt(2), 1/np.sqrt(2)])
         >>> analyze_pdf(psi, name="Bell state", stem=False)
@@ -295,71 +299,88 @@ def analyze_pdf(rho, name=None, stem=True):
     # Input validation
     if not isinstance(rho, (np.ndarray, list)):
         raise TypeError("Input must be a numpy array or array-like object")
-    
+
     rho = np.asarray(rho, dtype=complex)
-    
+
     if rho.size == 0:
         raise ValueError("Input array cannot be empty")
-    
+
     rho = cast_to_density_matrix(rho)
 
     # Extract diagonal elements and eigenvalues
     pdf = np.diag(rho)
     eigenvals, _ = np.linalg.eigh(rho)
-    
+
     # Clean small numerical artifacts
     pdf = clean(pdf)
     eigenvals = clean(eigenvals)
-    
+
     # Sort eigenvalues in descending order for better visualization
     eigenvals = np.sort(eigenvals)[::-1]
-    
+
     # Create the plot
     if stem:
-        plt.stem(range(len(pdf)), pdf, linefmt='red', markerfmt='ro', 
-                basefmt=' ', label='diag(ρ)')
-        plt.stem(range(len(eigenvals)), eigenvals, linefmt='k--', markerfmt='k^',
-                basefmt=' ', label='eigenvalues')
+        plt.stem(
+            range(len(pdf)),
+            pdf,
+            linefmt="red",
+            markerfmt="ro",
+            basefmt=" ",
+            label="diag(ρ)",
+        )
+        plt.stem(
+            range(len(eigenvals)),
+            eigenvals,
+            linefmt="k--",
+            markerfmt="k^",
+            basefmt=" ",
+            label="eigenvalues",
+        )
     else:
-        plt.plot(pdf, color="red", marker='o', label='diag(ρ)')
-        plt.plot(eigenvals, color='black', linestyle='dashed', marker='^', 
-                label='eigenvalues')
-    
+        plt.plot(pdf, color="red", marker="o", label="diag(ρ)")
+        plt.plot(
+            eigenvals,
+            color="black",
+            linestyle="dashed",
+            marker="^",
+            label="eigenvalues",
+        )
+
     # Set logarithmic scale and labels
-    plt.yscale('log')
+    plt.yscale("log")
     plt.ylabel("Probability (log scale)")
     plt.xlabel("Index")
-    
+
     # Set title
     title = "Population analysis"
     if name is not None:
         title += f" of {name}"
     plt.title(title)
-    
+
     plt.legend()
     plt.grid(True, alpha=0.3)
-    
+
     # Note: Function does not call plt.show() to allow user control
     return
 
 
-def partial_trace_diagblocksum(AB,d):
+def partial_trace_diagblocksum(AB, d):
     r"""
-    
-    This function implements the partial trace using a block matrix approach, 
-    where the composite matrix AB is viewed as a :math:`d \times d` array 
+
+    This function implements the partial trace using a block matrix approach,
+    where the composite matrix AB is viewed as a :math:`d \times d` array
     of :math:`d_2 \times d_2` blocks, and sum of the diagonal blocks gives the
     partial trace result.
 
     Args:
         AB: Any composite matrix over space :math:`H_1 \otimes H_2`.
-        d: The dimension of the reduced state. Must be a positive integer such 
-        that D is divisible by :math:`d`, where D is the dimension of the 
+        d: The dimension of the reduced state. Must be a positive integer such
+        that D is divisible by :math:`d`, where D is the dimension of the
         composite system AB.
 
     Returns:
         B : the reduced matrix of subsystem B with shape :math:` d\times d `.
-        
+
     Notes
     -----
     - The dimension of subsystem A is automatically computed as :math:`d_1 = D/d`
@@ -369,50 +390,49 @@ def partial_trace_diagblocksum(AB,d):
     Mathematical Details
     --------------------
     The reduced density matrix A is computed as:
-    
+
     .. math::
         A = \sum_j AB_{j,j}
-    
+
     where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d \times d`.
     """
 
     D = AB.shape[0]
-    assert int(D/d) == D/d, "d_out must divide D"
-    d2 = int(D/d)
-    
-    A = np.zeros((d,d),dtype=complex)
-    #sum the [d x d] boxes on diagonal
+    assert int(D / d) == D / d, "d_out must divide D"
+    d2 = int(D / d)
+
+    A = np.zeros((d, d), dtype=complex)
+    # sum the [d x d] boxes on diagonal
     for j in range(d2):
         col_idx = j
         row_idx = j
 
-        j0 = row_idx*d
+        j0 = row_idx * d
         j1 = j0 + d
 
-        i0 = col_idx*d
+        i0 = col_idx * d
         i1 = i0 + d
-
 
         A += AB[i0:i1, j0:j1]
     return A
 
 
-def partial_trace_blockTr(AB,d):
+def partial_trace_blockTr(AB, d):
     r"""
-    This function implements the partial trace using a block matrix approach, 
-    where the composite matrix AB is viewed as a :math:`d \times d` array 
-    of :math:`d_1 \times d_1` blocks, and the trace of each block gives the 
+    This function implements the partial trace using a block matrix approach,
+    where the composite matrix AB is viewed as a :math:`d \times d` array
+    of :math:`d_1 \times d_1` blocks, and the trace of each block gives the
     corresponding matrix element of the result matrix.
 
     Args:
         AB: Any composite matrix over space :math:`H_1 \otimes H_2`.
-        d: The dimension of the reduced state. Must be a positive integer such 
-        that D is divisible by :math:`d`, where D is the dimension of the 
+        d: The dimension of the reduced state. Must be a positive integer such
+        that D is divisible by :math:`d`, where D is the dimension of the
         composite system AB.
 
     Returns:
         A : the reduced matrix of subsystem A with shape :math:` d\times d `.
-        
+
     Notes
     -----
     - The dimension of subsystem B is automatically computed as :math:`d_2 = D/d`
@@ -423,38 +443,37 @@ def partial_trace_blockTr(AB,d):
     Mathematical Details
     --------------------
     The reduced density matrix element :math:`(i,j)` is computed as:
-    
+
     .. math::
         B[i,j] = \text{Tr}(AB_{i,j})
-    
+
     where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d_1 \times d_1`.
     """
 
-
     D = AB.shape[0]
 
-    assert int(D/d) == D/d, "d must divide linear dim(AB)"
-    d1 = int(D/d)
+    assert int(D / d) == D / d, "d must divide linear dim(AB)"
+    d1 = int(D / d)
 
-    B = np.zeros((d,d),dtype=complex)
+    B = np.zeros((d, d), dtype=complex)
 
-    #find the [d1 x d1] boxes
-    #take their traces
-    #save to matrix B
+    # find the [d1 x d1] boxes
+    # take their traces
+    # save to matrix B
     for i in range(d):
         for j in range(d):
             col_idx = i
             row_idx = j
 
-            i0 = col_idx*d1
+            i0 = col_idx * d1
             i1 = i0 + d1
 
-            j0 = row_idx*d1
+            j0 = row_idx * d1
             j1 = j0 + d1
 
-            B[i,j] = np.trace(AB[i0:i1, j0:j1])
+            B[i, j] = np.trace(AB[i0:i1, j0:j1])
 
-    #cast to real if possible
+    # cast to real if possible
     if np.allclose(B.imag, np.zeros_like(B)):
         B = B.real
 
