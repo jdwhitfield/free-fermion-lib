@@ -108,7 +108,6 @@ class TestRandomCliffordStates:
                 e
             ), "Error message should provide installation instructions"
 
-    @pytest.mark.skipif(not ff_rs.STIM_AVAILABLE, reason="stim package not available")
     def test_random_CHP_state_basic(self):
         """Test basic properties of random CHP states (only if stim available)"""
         n_qubits = 2
@@ -121,7 +120,6 @@ class TestRandomCliffordStates:
         # Check normalization
         assert np.allclose(np.linalg.norm(psi), 1.0), "State should be normalized"
 
-    @pytest.mark.skipif(not ff_rs.STIM_AVAILABLE, reason="stim package not available")
     def test_random_CHP_state_different_calls(self):
         """Test that different CHP state calls produce valid states"""
         n_qubits = 2
@@ -136,8 +134,6 @@ class TestRandomCliffordStates:
 
     def test_random_CHP_state_input_validation(self):
         """Test input validation for CHP states"""
-        if not ff_rs.STIM_AVAILABLE:
-            pytest.skip("stim package not available")
 
         # Test invalid types
         with pytest.raises(TypeError):

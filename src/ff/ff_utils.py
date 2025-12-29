@@ -213,6 +213,9 @@ def cast_to_density_matrix(rho):
 
     Returns:
         Density matrix as a NumPy array.
+
+    Notes: 
+        - Threshold for positivity checks is 1e-12
     """
     rho = np.asarray(rho, dtype=complex)
 
@@ -248,7 +251,7 @@ def cast_to_density_matrix(rho):
     assert np.allclose(rho, rho.conj().T), "Generated state is not hermitian"
     # MAY NEED TO BE REMOVED FOR SPEED
     assert np.all(
-        np.linalg.eigvalsh(rho) >= 0
+        np.linalg.eigvalsh(rho) >= -1e-12
     ), "Generated state is not positive semidefinite"
 
     return rho

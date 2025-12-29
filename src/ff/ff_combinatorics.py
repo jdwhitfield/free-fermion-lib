@@ -92,7 +92,7 @@ def hf(A):
         Hafnian value (complex or real)
     """
     if not isinstance(A, np.ndarray):
-        A = np.array(A)
+        A = np.asarray(A)
 
     n_verts = A.shape[0]
     if n_verts % 2 != 0:
@@ -130,7 +130,7 @@ def pt(A):
     Returns:
         Permanent value (complex or real)
     """
-    A = np.ndarray(A)
+    A = np.asarray(A)
     n = len(A)
 
     perms = itertools.permutations(range(n))
@@ -162,7 +162,7 @@ def dt(A):
     Returns:
         Determinant value (complex or real)
     """
-    A = np.ndarray(A)
+    A = np.asarray(A)
     n = len(A)
 
     perms = itertools.permutations(range(n))
