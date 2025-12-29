@@ -1074,7 +1074,6 @@ def eigh_sp(H):
     [L, Orth, _] = schur(ih, sort=sfunction)
 
     # format checking
-    _print(L)
     assert check_canonical_form(L)
     assert np.allclose(Orth @ Orth.T, np.eye(Orth.shape[0]))
     assert check_canonical_form(Orth.T @ ih @ Orth)
