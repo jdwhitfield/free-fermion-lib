@@ -15,9 +15,9 @@ Test categories:
 """
 
 import warnings
+
 import numpy as np
 import pytest
-
 
 # Import the library
 import ff
