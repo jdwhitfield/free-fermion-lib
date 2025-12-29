@@ -235,10 +235,14 @@ def cast_to_density_matrix(rho):
                 f"Vector input must be normalized (L1 or L2 norm ≈ 1). "
                 f"Got L1={l1_norm:.6f}, L2={l2_norm:.6f}"
             )
-
+    
     # Validate density matrix properties
-    if len(rho.shape) != 2 or rho.shape[0] != rho.shape[1] or not np.allclose(np.trace(rho),1):
-        raise ValueError("Density matrix must be square and normalized (trace=1)")
+    if len(rho.shape) != 2 or rho.shape[0] != rho.shape[1]: # or not np.allclose(np.trace(rho),1):
+        raise ValueError("Generated state is not square")
+    assert np.allclose(1, np.trace(rho)), "Generated state is not normalized"
+    assert np.allclose(rho,rho.conj().T), "Generated state is not hermitian"
+    ## MAY NEED TO BE REMOVED FOR SPEED
+    assert np.all(np.linalg.eigvalsh(rho) >= 0), "Generated state is not positive semidefinite"
 
     return rho
 
@@ -431,7 +435,6 @@ def partial_trace_blockTr(AB,d):
 
     assert int(D/d) == D/d, "d must divide linear dim(AB)"
     d1 = int(D/d)
-    
 
     B = np.zeros((d,d),dtype=complex)
 
