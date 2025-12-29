@@ -17,7 +17,7 @@ Copyright 2025 James.D.Whitfield@dartmouth.edu
 Licensed under MIT License.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.2.2"
 __author__ = "James D. Whitfield"
 __email__ = "James.D.Whitfield@dartmouth.edu"
 
