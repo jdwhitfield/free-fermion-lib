@@ -128,8 +128,7 @@ def generate_pauli_group(n, verbose=False):
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(
-            f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -450,8 +449,7 @@ def random_FF_rotation(n_sites, seed=None, returnH=False, returnOrb=False):
     return expm(-1j * G_op)  # Compute the unitary operator
 
 
-def random_FF_state(n_sites, fixedN=False,
-                    seed=None, returnH=False, pure=False):
+def random_FF_state(n_sites, fixedN=False, seed=None, returnH=False, pure=False):
     """Generate Haar random free fermion state using symplectic rotations.
 
     This function generates free-fermion states that are uniformly distributed
@@ -977,8 +975,7 @@ def is_matchgate(M, verbose=False):
     if np.allclose(det_inner, det_corner):
         if verbose:
             print(
-                "Satisfies the matchgate condition, det1=det2=",
-                np.round(det_inner, 4)
+                "Satisfies the matchgate condition, det1=det2=", np.round(det_inner, 4)
             )
         return True
     else:

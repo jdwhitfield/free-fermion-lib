@@ -394,8 +394,7 @@ def linear_entropy(p):
 
     sL_alt = 1 - np.sum(np.square(p))
 
-    assert np.allclose(sL, sL_alt), \
-        f"Computed vals do not match:{sL} vs {sL_alt}"
+    assert np.allclose(sL, sL_alt), f"Computed vals do not match:{sL} vs {sL_alt}"
 
     return sL
 

@@ -74,8 +74,7 @@ def random_qubit_state(n, seed=None):
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(
-            f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -135,8 +134,7 @@ def random_qubit_pure_state(n, seed=None):
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(
-            f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -152,8 +150,7 @@ def random_qubit_pure_state(n, seed=None):
     psi = U @ zero_state
 
     # check normalization of the pure state
-    assert np.allclose(1, np.linalg.norm(psi)), \
-        "Generated state is not normalized"
+    assert np.allclose(1, np.linalg.norm(psi)), "Generated state is not normalized"
 
     return psi
 
@@ -206,8 +203,7 @@ def random_CHP_state(n_qubits):
     # Input validation
     if not isinstance(n_qubits, int):
         raise TypeError(
-            "Number of qubits must be an integer," +
-            f" got {type(n_qubits).__name__}"
+            "Number of qubits must be an integer," + f" got {type(n_qubits).__name__}"
         )
 
     if n_qubits <= 0:
@@ -466,8 +462,7 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
     if N is not None and (not isinstance(N, int) or N < 0 or N > n_sites):
-        raise ValueError(
-            f"Particle number N must be between 0 and {n_sites}, got {N}")
+        raise ValueError(f"Particle number N must be between 0 and {n_sites}, got {N}")
 
     if seed is not None:
         np.random.seed(seed)
@@ -488,8 +483,7 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
             psi = alphas[j] @ psi
 
     # For pure states, apply Haar random unitary to initial state
-    W_op = random_FF_rotation(
-        n_sites, seed=seed + 1 if seed is not None else None)
+    W_op = random_FF_rotation(n_sites, seed=seed + 1 if seed is not None else None)
     psi = W_op @ psi
 
     return psi
