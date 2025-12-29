@@ -22,7 +22,6 @@ from scipy.stats import unitary_group
 
 from .ff_lib import (
     jordan_wigner_alphas,
-    jordan_wigner_majoranas,
     build_op,
     build_V,
     random_FF_rotation,
@@ -32,12 +31,12 @@ from .ff_lib import (
 from .ff_utils import clean, cast_to_density_matrix
 
 # Check if stim package is available
-try:
-    import stim
-
-    STIM_AVAILABLE = True
-except ImportError:
-    STIM_AVAILABLE = False
+# try:
+#     import stim
+#
+#     STIM_AVAILABLE = True
+# except ImportError:
+#     STIM_AVAILABLE = False
 
 
 def random_qubit_state(n, seed=None):
@@ -75,7 +74,8 @@ def random_qubit_state(n, seed=None):
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(
+            f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -135,7 +135,8 @@ def random_qubit_pure_state(n, seed=None):
     """
     # Input validation
     if not isinstance(n, int):
-        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
+        raise TypeError(
+            f"Number of qubits must be an integer, got {type(n).__name__}")
 
     if n <= 0:
         raise ValueError(f"Number of qubits must be positive, got {n}")
@@ -151,7 +152,8 @@ def random_qubit_pure_state(n, seed=None):
     psi = U @ zero_state
 
     # check normalization of the pure state
-    assert np.allclose(1, np.linalg.norm(psi)), "Generated state is not normalized"
+    assert np.allclose(1, np.linalg.norm(psi)), \
+        "Generated state is not normalized"
 
     return psi
 
@@ -193,18 +195,19 @@ def random_CHP_state(n_qubits):
         - The generated states are uniformly distributed over the stabilizer
           state space
     """
-    if not STIM_AVAILABLE:
-        raise ImportError(
-            "The 'stim' package is required for generating Clifford states. "
-            "Please install it using: pip install stim"
-        )
+    # if not STIM_AVAILABLE:
+    #     raise ImportError(
+    #         "The 'stim' package is required for generating Clifford states. "
+    #         "Please install it using: pip install stim"
+    #     )
 
     import stim
 
     # Input validation
     if not isinstance(n_qubits, int):
         raise TypeError(
-            f"Number of qubits must be an integer, got {type(n_qubits).__name__}"
+            "Number of qubits must be an integer," +
+            f" got {type(n_qubits).__name__}"
         )
 
     if n_qubits <= 0:
@@ -227,17 +230,17 @@ def random_FF_state_randH(n_sites, seed=None):
     a random quadratic Hamiltonian and computing the corresponding FF state
     via exponentiation. The resulting state is a density matrix.
 
-    NOTE: This function does not generate Haar random states since exponentiating
-        a random Hamiltonian does not generate correctly distributed eigenvalues
-        in the resulting random matrix.
+    NOTE: This function does not generate Haar random states since
+        exponentiating a random Hamiltonian does not generate correctly
+        distribute eigenvalues of the resulting random matrix.
 
     Args:
         n_sites (int): The number of fermionic sites
         seed (int, optional): Random seed for reproducibility
 
     Returns:
-        numpy.ndarray: A random free fermion state of dimension (2^n_sites, 2^n_sites)
-                      as a normalized density matrix
+        numpy.ndarray: A random free fermion state of dimension
+                (2^n_sites, 2^n_sites) as a normalized density matrix
 
     Raises:
         ValueError: If n_sites is not a positive integer
@@ -268,8 +271,10 @@ def random_FF_state_randH(n_sites, seed=None):
     if seed is not None:
         np.random.seed(seed)
 
-    A = np.random.randn(n_sites, n_sites) + 1j * np.random.randn(n_sites, n_sites)
-    Z = np.random.randn(n_sites, n_sites) + 1j * np.random.randn(n_sites, n_sites)
+    A = np.random.randn(n_sites, n_sites)
+    A = A + 1j * np.random.randn(n_sites, n_sites)
+    Z = np.random.randn(n_sites, n_sites)
+    Z = Z + 1j * np.random.randn(n_sites, n_sites)
     A = A + A.conj().T
     Z = Z - Z.T
 
@@ -285,7 +290,7 @@ def random_FF_state_randH(n_sites, seed=None):
 
 
 def random_FF_state_rotPDF(n_sites, returnS=False, seed=None):
-    """Generate a random free fermion mixed state from rotated probability distribution.
+    """Generate random free fermion state from rotated probability vector.
 
     This function generates a random free fermion state by applying a random
     free fermion rotation to a random probability distribution (Dirichlet
@@ -293,15 +298,15 @@ def random_FF_state_rotPDF(n_sites, returnS=False, seed=None):
 
     Args:
         n_sites (int): The number of fermionic sites
-        returnS (bool, optional): If True, also return the probability distribution
-                                 (default: False)
+        returnS (bool, optional): If True, also return the probability
+            distribution (default: False)
         seed (int, optional): Random seed for reproducibility
 
     Returns:
-        numpy.ndarray or tuple: If returnS is False, returns a random free fermion
-                               state of dimension (2^n_sites, 2^n_sites). If returnS
-                               is True, returns (rho, s) where s is the probability
-                               distribution used.
+        numpy.ndarray or tuple: If returnS is False, returns a random free
+            fermion state of dimension (2^n_sites, 2^n_sites). If returnS
+            is True, returns (rho, s) where s is the probability
+            distribution used.
 
     Raises:
         ValueError: If n_sites is not a positive integer
@@ -354,18 +359,18 @@ def random_FF_state_rotPDF(n_sites, returnS=False, seed=None):
 def random_FF_pure_state_W0(n_sites, seed=None):
     """Generate a Haar random free fermion pure state from vacuum rotation.
 
-    This function generates free-fermion pure states that are uniformly distributed
-    over the space of free-fermion states using Haar random symplectic transformations
-    applied to the vacuum state |0⟩.
+    This function generates free-fermion pure states that are uniformly
+    distributed over the space of free-fermion states using Haar random
+    symplectic transformations applied to the vacuum state |0⟩.
 
     Args:
         n_sites (int): The number of fermionic sites
         seed (int, optional): Random seed for reproducibility
 
     Returns:
-        numpy.ndarray or tuple: A normalized Haar random free fermion pure state
-                               of dimension (2^n_sites, 1). If returnH is True, also
-                               returns the generator matrix H.
+        numpy.ndarray or tuple: A normalized Haar random free fermion pure
+                state of dimension (2^n_sites, 1). If returnH is True, also
+                returns the generator matrix H.
 
     Raises:
         ValueError: If n_sites is not a positive integer
@@ -403,21 +408,22 @@ def random_FF_pure_state_W0(n_sites, seed=None):
     psi = W_op @ zero_state
 
     # check normalization of the pure state
-    assert np.allclose(1, np.linalg.norm(psi)), "Generated state is not normalized"
+    assert np.allclose(1, np.linalg.norm(psi)), "Rand state not normalized"
 
     return psi
 
 
 def random_FF_pure_state_WN(n_sites, N=None, seed=None):
-    """Generate a Haar random free fermion pure state with fixed particle number.
+    """Generates Haar random free fermion pure state with fixed particle number
 
     This function generates free-fermion pure states with a specified particle
     number N, uniformly distributed over the space of N-particle free-fermion
     states using Haar random symplectic transformations.
 
-    NOTE: This function is most-likely generating states that will not have fixed particle number.
-          Further testing and validation is required to ensure that the generated states are in a
-          fixed-N subspace (also which fermionic basis should be used).
+    NOTE: This function is most-likely generating states that will not have
+        fixed particle number. Further testing and validation is required to
+        ensure that the generated states are in a fixed-N subspace (also
+        which fermionic basis should be used).
 
     Args:
         n_sites (int): The number of fermionic sites
@@ -426,9 +432,9 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
         seed (int, optional): Random seed for reproducibility
 
     Returns:
-        numpy.ndarray or tuple: A normalized Haar random free fermion pure state
-                               of dimension (2^n_sites, 1) with N particles.
-                               If returnH is True, also returns the generator matrix H.
+        numpy.ndarray or tuple: A normalized Haar random free fermion pure
+            state of dimension (2^n_sites, 1) with N particles. If returnH
+            is True, also returns the generator matrix H.
 
     Raises:
         ValueError: If n_sites is not a positive integer or N is invalid
@@ -460,7 +466,8 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
         raise ValueError(f"Number of sites must be positive, got {n_sites}")
 
     if N is not None and (not isinstance(N, int) or N < 0 or N > n_sites):
-        raise ValueError(f"Particle number N must be between 0 and {n_sites}, got {N}")
+        raise ValueError(
+            f"Particle number N must be between 0 and {n_sites}, got {N}")
 
     if seed is not None:
         np.random.seed(seed)
@@ -481,29 +488,33 @@ def random_FF_pure_state_WN(n_sites, N=None, seed=None):
             psi = alphas[j] @ psi
 
     # For pure states, apply Haar random unitary to initial state
-    W_op = random_FF_rotation(n_sites, seed=seed + 1 if seed is not None else None)
+    W_op = random_FF_rotation(
+        n_sites, seed=seed + 1 if seed is not None else None)
     psi = W_op @ psi
 
     return psi
 
 
 def random_FF_pure_state_CN(n_sites, seed=None):
-    """Generate a random free fermion pure state using random orbital rotations.
+    """Generate random free fermion pure state using random orbital rotations.
 
     This function generates a random free fermion pure state by first creating
     a random vacuum state through projections, then applying creation operators
-    according to a random occupation pattern, all with randomly rotated orbitals.
+    according to a random occupation pattern, all with randomly rotated
+    orbitals.
 
-    NOTE: This function is most-likely generating states that will not have fixed particle number.
-        Further testing and validation is required to ensure that the generated states are in a
-        fixed-N subspace (also which fermionic basis should be used).
+    NOTE: This function is most-likely generating states that will not have
+        fixed particle number. Further testing and validation is required
+        to ensure that the generated states are in a fixed-N subspace (also
+        which fermionic basis should be used).
 
     Args:
         n_sites (int): The number of fermionic sites
         seed (int, optional): Random seed for reproducibility
 
     Returns:
-        numpy.ndarray: A random free fermion pure state of dimension (2^n_sites, 1)
+        numpy.ndarray: A random free fermion pure state of
+                       dimension (2^n_sites, 1)
 
     Raises:
         ValueError: If n_sites is not a positive integer
@@ -542,7 +553,7 @@ def random_FF_pure_state_CN(n_sites, seed=None):
 
     K = np.append(np.ones(N), (np.zeros(n_sites - N)))
 
-    # random orbital rotation respecting the antisymmetry of the given operators
+    # random orbital rotation respecting antisymmetry of the given operators
     C = random_FF_rotation(
         n_sites, seed=seed + 1 if seed is not None else None, returnOrb=True
     )
@@ -553,7 +564,8 @@ def random_FF_pure_state_CN(n_sites, seed=None):
 
     rand_alphas = rotate_operators(C, jordan_wigner_alphas(n_sites))
 
-    # Verify that the algebra structure is preserved under rotation (warning: likely pretty slow)
+    # Verify that the algebra structure is preserved under rotation
+    # (warning: likely pretty slow)
     S = compute_algebra_S(jordan_wigner_alphas(n_sites))
     Sr = compute_algebra_S(rand_alphas)
     assert np.allclose(S, Sr), "Algebra structure not preserved under rotation"
@@ -624,7 +636,7 @@ def get_orthogonal_vectors(v):
     n = v.shape[0]
 
     if n < 2:
-        return np.array([])  # Need at least 2 dimensions to have orthogonal vectors
+        return np.array([])  # Need at least 2 dims to have orthogonal vectors
 
     # Normalize the input vector
     v_norm = np.linalg.norm(v)
@@ -728,7 +740,10 @@ def build_unitary_path(w, v):
         H - H.conj().T, 0
     ), f"H is not Hermitian: {clean(H - H.conj().T, 13)}"
 
-    path = lambda t: expm(-1j * H * t) @ w
+    def path(t):
+        return expm(-1j * H * t) @ w
+
+    # path = lambda t: expm(-1j * H * t) @ w
 
     return path
 
@@ -785,6 +800,7 @@ def build_linear_path(w, v):
     w = w / np.linalg.norm(w)
     v = v / np.linalg.norm(v)
 
-    path = lambda s: (s * v + (1 - s) * w) / np.linalg.norm(s * v + (1 - s) * w)
+    def path(s):
+        return (s * v + (1 - s) * w) / np.linalg.norm(s * v + (1 - s) * w)
 
     return path
