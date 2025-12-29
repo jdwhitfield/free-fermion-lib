@@ -2,12 +2,13 @@
 Distance Measures Tests for Free Fermion Library
 
 This module contains comprehensive tests for the distance measure functions in
-ff_distance_measures.py, including stabilizer distribution, Stabilizer Rényi Entropy (SRE),
-general Rényi entropy, linear entropy, fermionic covariance distribution, and
-Fermionic Anti-Flatness (FAF) distance.
+ff_distance_measures.py, including stabilizer distribution, Stabilizer Rényi
+Entropy (SRE), general Rényi entropy, linear entropy, fermionic covariance
+distribution, and Fermionic Anti-Flatness (FAF) distance.
 
 Test categories:
-- Mathematical correctness tests (entropy bounds, distance axioms, normalization)
+- Mathematical correctness tests (entropy bounds, distance axioms,
+    normalization)
 - Input validation tests (invalid types, dimensions, parameters)
 - Edge cases (zero states, maximally mixed states, single qubit systems)
 - Integration tests (compatibility with existing FF functions)
@@ -36,10 +37,10 @@ class TestStabilizerDistribution:
         assert len(xi) == 4, "Single qubit should have 4 Pauli operators"
 
         # Should be normalized
-        assert np.allclose(np.sum(xi), 1.0), "Distribution should be normalized"
+        assert np.allclose(np.sum(xi), 1.0), "Distro should be normalized"
 
         # All elements should be non-negative
-        assert np.all(xi >= -1e-10), "All probabilities should be non-negative"
+        assert np.all(xi >= -1e-10), "All probs should be non-negative"
 
     def test_two_qubit_system(self):
         """Test stabilizer distribution for two-qubit system"""
@@ -51,7 +52,7 @@ class TestStabilizerDistribution:
         assert len(xi) == 16, "Two qubits should have 16 Pauli operators"
 
         # Should be normalized
-        assert np.allclose(np.sum(xi), 1.0), "Distribution should be normalized"
+        assert np.allclose(np.sum(xi), 1.0), "Distro should be normalized"
 
         # All elements should be non-negative
         assert np.all(xi >= -1e-10), "All probabilities should be non-negative"
@@ -63,7 +64,7 @@ class TestStabilizerDistribution:
         xi = ff.stabilizer_distribution(rho)
 
         # Should be normalized
-        assert np.allclose(np.sum(xi), 1.0), "Distribution should be normalized"
+        assert np.allclose(np.sum(xi), 1.0), "Distro should be normalized"
 
         # For maximally mixed state, only identity should contribute
         # xi[0] corresponds to identity operator
@@ -311,7 +312,7 @@ class TestLinearEntropy:
         purity = np.sum(p**2)
 
         # Linear entropy = 1 - purity
-        d = len(p)
+        # d = len(p)
         expected_lin_ent = 1 - purity
 
         assert np.allclose(
@@ -560,11 +561,11 @@ class TestEdgeCases:
     def test_identity_matrices(self):
         """Test behavior with identity matrices"""
         # Unnormalized identity
-        I = np.eye(4)
+        Id = np.eye(4)
 
         # Functions should handle this (after normalization)
         try:
-            xi = ff.stabilizer_distribution(I)
+            xi = ff.stabilizer_distribution(Id)
             assert isinstance(xi, np.ndarray), "Should handle identity matrix"
         except Exception:
             # May fail due to normalization issues, which is acceptable
@@ -761,14 +762,14 @@ class TestSpecificKnownCases:
             xi = ff.stabilizer_distribution(psi)
             assert np.allclose(
                 np.sum(xi), 1.0
-            ), f"Basis state should give normalized distribution"
+            ), "Basis state should give normalized distribution"
 
             sre = ff.SRE(psi)
-            assert np.isfinite(sre), f"SRE should be finite for basis states"
+            assert np.isfinite(sre), "SRE should be finite for basis states"
 
             if len(psi) >= 4:  # Multi-qubit states
                 faf = ff.FAF(psi)
-                assert np.isfinite(faf), f"FAF should be finite for basis states"
+                assert np.isfinite(faf), "FAF should be finite for basis states"
 
 
 class TestPerformanceAndNumericalPrecision:
@@ -851,7 +852,7 @@ class TestPerformanceAndNumericalPrecision:
             times.append(end_time - start_time)
 
             # Basic sanity check
-            assert len(xi) == 4**n_qubits, f"Should have correct number of elements"
+            assert len(xi) == 4**n_qubits, "Should have correct number of elements"
 
         # Times should be reasonable (this is a very loose check)
         assert all(t < 10.0 for t in times), "Computation times should be reasonable"
@@ -973,6 +974,8 @@ class TestWarningsAndEdgeCaseHandling:
         """Test that appropriate warnings are handled"""
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
+
+            print("Warnings:",w)
 
             # Operations that might generate warnings
             p_with_zeros = np.array([0.5, 0.5, 0, 0])
