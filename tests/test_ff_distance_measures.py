@@ -975,7 +975,7 @@ class TestWarningsAndEdgeCaseHandling:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 
-            print("Warnings:",w)
+            print("Warnings:", w)
 
             # Operations that might generate warnings
             p_with_zeros = np.array([0.5, 0.5, 0, 0])

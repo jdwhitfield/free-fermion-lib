@@ -17,7 +17,6 @@ import numpy as np
 import pytest
 
 # Import the library
-import ff
 import ff.ff_random_states as ff_rs
 
 
