@@ -122,7 +122,8 @@ def clean(obj, threshold=1e-6):
             # If the imaginary part is small, return only the real part
             return np.round(obj.real, ndigits)
         else:
-            # If the imaginary part is significant, return the complex number rounded
+            # If the imaginary part is significant, return the
+            # complex number rounded
             return np.round(obj, ndigits)
     else:
         raise TypeError("Unsupported type for cleaning: {}".format(type(obj)))
@@ -188,7 +189,7 @@ def kron_plus(a, b):
 
 
 def cast_to_pdf(rho):
-    """Casts input density matrix or wave function to a probability distribution."""
+    """Casts input to a probability distribution."""
 
     rho = cast_to_density_matrix(np.asarray(rho, dtype=complex))
     pdf = np.diag(rho)
@@ -197,7 +198,9 @@ def cast_to_pdf(rho):
     if np.allclose(pdf, pdf.real):
         pdf = pdf.real
     else:
-        raise ValueError("Probability distribution has non-negligible imaginary part")
+        raise ValueError(
+            "Probability distribution has " "non-negligible imaginary part"
+        )
 
     return pdf
 
@@ -206,7 +209,7 @@ def cast_to_density_matrix(rho):
     """Casts input to a density matrix.
 
     Args:
-        rho: Input array, can be a density matrix, wavefunction, or probability distribution.
+        rho: Input: can be a density matrix, wavefunction, or prob. distro.
 
     Returns:
         Density matrix as a NumPy array.
@@ -243,7 +246,7 @@ def cast_to_density_matrix(rho):
         raise ValueError("Generated state is not square")
     assert np.allclose(1, np.trace(rho)), "Generated state is not normalized"
     assert np.allclose(rho, rho.conj().T), "Generated state is not hermitian"
-    ## MAY NEED TO BE REMOVED FOR SPEED
+    # MAY NEED TO BE REMOVED FOR SPEED
     assert np.all(
         np.linalg.eigvalsh(rho) >= 0
     ), "Generated state is not positive semidefinite"
@@ -255,18 +258,18 @@ def analyze_pdf(rho, name=None, stem=True):
     """Population analysis and visualization for probability distributions.
 
     Analyzes and visualizes probability distributions from density matrices or
-    wavefunctions. Computes both diagonal elements and eigenvalues of the density
-    matrix and displays them with optional logarithmic scaling.
+    wavefunctions. Computes both diagonal elements and eigenvalues of the
+    density matrix and displays them with optional logarithmic scaling.
 
     Args:
-        rho (numpy.ndarray): Density matrix, wavefunction, or probability distribution.
+        rho (numpy.ndarray): Density matrix, wavefunction, or prob. distro.
             - If 2D square matrix: treated as density matrix
             - If 1D array or column vector: interpreted based on normalization
                 - L2 norm ≈ 1: treated as normalized wavefunction
                 - L1 norm ≈ 1: treated as normalized probability distribution
         name (str, optional): Name for the plot title. If provided, will appear
             as "Population analysis of {name}". Default is None.
-        stem (bool, optional): Whether to use stem plot (True) or line plot (False).
+        stem (bool, optional): Whether to use stem (True) or line plot (False).
             Default is True.
 
     Returns:
@@ -280,8 +283,8 @@ def analyze_pdf(rho, name=None, stem=True):
         - The function automatically converts wavefunctions to density matrices
         - Diagonal elements are plotted in red, eigenvalues in black dashed
         - Y-axis uses logarithmic scaling to highlight small probabilities
-        - Small numerical values are cleaned using the FF library clean() function
-        - Plot is created but not displayed; user must call plt.show() separately
+        - Small numerical values cleaned using the FF library clean() function
+        - Plot is created but not displayed; use plt.show() separately
 
     Examples:
         >>> import numpy as np
@@ -383,7 +386,7 @@ def partial_trace_diagblocksum(AB, d):
 
     Notes
     -----
-    - The dimension of subsystem A is automatically computed as :math:`d_1 = D/d`
+    - Dimension of subsystem A is automatically computed as :math:`d_1 = D/d`
     - The composite system dimension D must be exactly divisible by :math:`d`
     - This is the partial trace over subsystem A.
 
@@ -394,7 +397,8 @@ def partial_trace_diagblocksum(AB, d):
     .. math::
         A = \sum_j AB_{j,j}
 
-    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d \times d`.
+    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of
+    size :math:`d \times d`.
     """
 
     D = AB.shape[0]
@@ -435,7 +439,7 @@ def partial_trace_blockTr(AB, d):
 
     Notes
     -----
-    - The dimension of subsystem B is automatically computed as :math:`d_2 = D/d`
+    - Dimension of subsystem B is automatically computed as :math:`d_2 = D/d`
     - The composite system dimension D must be exactly divisible by :math:`d`
     - This is the partial trace over subsystem B.
 
@@ -447,7 +451,8 @@ def partial_trace_blockTr(AB, d):
     .. math::
         B[i,j] = \text{Tr}(AB_{i,j})
 
-    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size :math:`d_1 \times d_1`.
+    where :math:`AB_{i,j}` is the :math:`(i,j)`-th block of size
+    :math:`d_1 \times d_1`.
     """
 
     D = AB.shape[0]
