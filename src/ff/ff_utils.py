@@ -214,7 +214,7 @@ def cast_to_density_matrix(rho):
     Returns:
         Density matrix as a NumPy array.
 
-    Notes: 
+    Notes:
         - Threshold for positivity checks is 1e-12
     """
     rho = np.asarray(rho, dtype=complex)
