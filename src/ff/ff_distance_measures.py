@@ -25,15 +25,12 @@ Copyright 2025 James.D.Whitfield@dartmouth.edu
 """
 
 import numpy as np
-from scipy.stats import entropy
 from scipy.linalg import schur
+from scipy.stats import entropy
 
-from .ff_lib import (
-    generate_pauli_group,
-    compute_cov_matrix,
-    jordan_wigner_majoranas,
-)
-from .ff_utils import clean, cast_to_density_matrix, cast_to_pdf
+from .ff_lib import (compute_cov_matrix, generate_pauli_group,
+                     jordan_wigner_majoranas)
+from .ff_utils import cast_to_density_matrix, cast_to_pdf, clean
 
 
 def stabilizer_distribution(rho):

@@ -20,15 +20,10 @@ import numpy as np
 from scipy.linalg import expm, logm
 from scipy.stats import unitary_group
 
-from .ff_lib import (
-    jordan_wigner_alphas,
-    build_op,
-    build_V,
-    random_FF_rotation,
-    rotate_operators,
-    compute_algebra_S,
-)
-from .ff_utils import clean, cast_to_density_matrix
+from .ff_lib import (build_op, build_V, compute_algebra_S,
+                     jordan_wigner_alphas, random_FF_rotation,
+                     rotate_operators)
+from .ff_utils import cast_to_density_matrix, clean
 
 # Check if stim package is available
 # try:

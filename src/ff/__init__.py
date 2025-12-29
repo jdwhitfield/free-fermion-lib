@@ -22,102 +22,46 @@ __author__ = "James D. Whitfield"
 __email__ = "James.D.Whitfield@dartmouth.edu"
 
 # Combinatorial functions from ff_combinatorics
-from .ff_combinatorics import sgn, pf, hf, pt, dt, dt_eigen
-
-# Graph theory functions from ff_graph_theory
-from .ff_graph_theory import (
-    plot_graph_with_edge_weights,
-    generate_random_planar_graph,
-    plot_planar_embedding,
-    dual_graph_H,
-    faces,
-    complete_face,
-    pfo_algorithm,
-    compute_tree_depth,
-    count_perfect_matchings,
-    find_perfect_matchings_brute,
-    count_perfect_matchings_planar,
-)
-
-# Core quantum physics functions from ff_lib
-from .ff_lib import (
-    permutation_to_matrix,
-    pauli_matrices,
-    generate_pauli_group,
-    jordan_wigner_lowering,
-    jordan_wigner_alphas,
-    jordan_wigner_majoranas,
-    rotate_operators,
-    build_V,
-    build_H,
-    build_Omega,
-    build_reordering_xx_to_xp,
-    build_K,
-    random_FF_rotation,
-    random_FF_state,
-    kitaev_chain,
-    is_symp,
-    check_canonical_form,
-    generate_gaussian_state,
-    build_op,
-    random_H_generator,
-    correlation_matrix,
-    compute_cov_matrix,
-    compute_2corr_matrix,
-    compute_algebra_S,
-    is_matchgate,
-    eigh_sp,
-    eigv_sp,
-    eigm_sp_can,
-    eigm_sp,
-)
-
-# Utility functions from ff_utils
-from .ff_utils import (
-    print_custom,
-    clean,
-    formatted_output,
-    generate_random_bitstring,
-    kron_plus,
-    partial_trace_blockTr as partial_trace_over_2,
-    partial_trace_diagblocksum as partial_trace_over_1,
-)
-
+from .ff_combinatorics import dt, dt_eigen, hf, pf, pt, sgn
 # Distance measure functions from ff_distance_measures
-from .ff_distance_measures import (
-    stabilizer_distribution,
-    SRE,
-    FAF,
-    renyi_entropy,
-    linear_entropy,
-    cov_distribution,
-    total_variation_distance,
-    trace_distance,
-    relative_entropy,
-    jensen_shannon_divergence,
-    bhattacharyya_coeff,
-)
-
+from .ff_distance_measures import (FAF, SRE, bhattacharyya_coeff,
+                                   cov_distribution, jensen_shannon_divergence,
+                                   linear_entropy, relative_entropy,
+                                   renyi_entropy, stabilizer_distribution,
+                                   total_variation_distance, trace_distance)
+# Graph theory functions from ff_graph_theory
+from .ff_graph_theory import (complete_face, compute_tree_depth,
+                              count_perfect_matchings,
+                              count_perfect_matchings_planar, dual_graph_H,
+                              faces, find_perfect_matchings_brute,
+                              generate_random_planar_graph, pfo_algorithm,
+                              plot_graph_with_edge_weights,
+                              plot_planar_embedding)
+# Core quantum physics functions from ff_lib
+from .ff_lib import (build_H, build_K, build_Omega, build_op,
+                     build_reordering_xx_to_xp, build_V, check_canonical_form,
+                     compute_2corr_matrix, compute_algebra_S,
+                     compute_cov_matrix, correlation_matrix, eigh_sp, eigm_sp,
+                     eigm_sp_can, eigv_sp, generate_gaussian_state,
+                     generate_pauli_group, is_matchgate, is_symp,
+                     jordan_wigner_alphas, jordan_wigner_lowering,
+                     jordan_wigner_majoranas, kitaev_chain, pauli_matrices,
+                     permutation_to_matrix, random_FF_rotation,
+                     random_FF_state, random_H_generator, rotate_operators)
 # Random state generation functions from ff_random_states
-from .ff_random_states import (
-    random_qubit_pure_state,
-    random_CHP_state,
-    random_FF_state_randH,
-    random_FF_state_rotPDF,
-    random_FF_pure_state_W0,
-    random_FF_pure_state_WN,
-    random_FF_pure_state_CN,
-    get_orthogonal_vectors,
-    build_unitary_path,
-    build_linear_path,
-)
-
+from .ff_random_states import (build_linear_path, build_unitary_path,
+                               get_orthogonal_vectors, random_CHP_state,
+                               random_FF_pure_state_CN,
+                               random_FF_pure_state_W0,
+                               random_FF_pure_state_WN, random_FF_state_randH,
+                               random_FF_state_rotPDF, random_qubit_pure_state)
 # Additional utility functions from ff_utils
-from .ff_utils import (
-    cast_to_density_matrix,
-    cast_to_pdf,
-    analyze_pdf,
-)
+# Utility functions from ff_utils
+from .ff_utils import (analyze_pdf, cast_to_density_matrix, cast_to_pdf, clean,
+                       formatted_output, generate_random_bitstring, kron_plus)
+from .ff_utils import partial_trace_blockTr as partial_trace_over_2
+from .ff_utils import partial_trace_diagblocksum as partial_trace_over_1
+from .ff_utils import print_custom
 
 # Define what gets imported with "from ff import *"
 __all__ = [

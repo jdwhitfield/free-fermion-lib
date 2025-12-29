@@ -7,8 +7,8 @@ Copyright 2025 James.D.Whitfield@dartmouth.edu
 Licensed under MIT License.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def print_custom(obj, k=9):
