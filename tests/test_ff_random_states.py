@@ -54,7 +54,9 @@ class TestRandomQubitStates:
         psi2 = ff_rs.random_qubit_pure_state(n, seed=456)
 
         # States should be different (with high probability)
-        assert not np.allclose(psi1, psi2, atol=1e-10), "Different seeds should produce different states"
+        assert not np.allclose(
+            psi1, psi2, atol=1e-10
+        ), "Different seeds should produce different states"
 
     def test_random_qubit_pure_state_input_validation(self):
         """Test input validation for random qubit pure states"""
@@ -77,8 +79,13 @@ class TestRandomQubitStates:
         for n in [1, 2, 3, 4]:
             psi = ff_rs.random_qubit_pure_state(n, seed=42)
             expected_dim = 2**n
-            assert psi.shape == (expected_dim, 1), f"State should be {expected_dim}x1 for n={n}"
-            assert np.allclose(np.linalg.norm(psi), 1.0), f"State should be normalized for n={n}"
+            assert psi.shape == (
+                expected_dim,
+                1,
+            ), f"State should be {expected_dim}x1 for n={n}"
+            assert np.allclose(
+                np.linalg.norm(psi), 1.0
+            ), f"State should be normalized for n={n}"
 
 
 class TestRandomCliffordStates:
@@ -92,11 +99,15 @@ class TestRandomCliffordStates:
             psi = ff_rs.random_CHP_state(2)
             # If we get here, stim is available
             assert psi.shape == (4, 1), "CHP state should have correct dimensions"
-            assert np.allclose(np.linalg.norm(psi), 1.0), "CHP state should be normalized"
+            assert np.allclose(
+                np.linalg.norm(psi), 1.0
+            ), "CHP state should be normalized"
         except ImportError as e:
             # Check that error message is helpful
             assert "stim" in str(e).lower(), "Error message should mention stim"
-            assert "pip install stim" in str(e), "Error message should provide installation instructions"
+            assert "pip install stim" in str(
+                e
+            ), "Error message should provide installation instructions"
 
     @pytest.mark.skipif(not ff_rs.STIM_AVAILABLE, reason="stim package not available")
     def test_random_CHP_state_basic(self):
@@ -115,11 +126,13 @@ class TestRandomCliffordStates:
     def test_random_CHP_state_different_calls(self):
         """Test that different CHP state calls produce valid states"""
         n_qubits = 2
-        
+
         # Generate multiple states and check they are all valid
         for i in range(3):
             psi = ff_rs.random_CHP_state(n_qubits)
-            assert np.allclose(np.linalg.norm(psi), 1.0), f"State {i} should be normalized"
+            assert np.allclose(
+                np.linalg.norm(psi), 1.0
+            ), f"State {i} should be normalized"
             assert psi.shape == (2**n_qubits, 1), f"State {i} should have correct shape"
 
     def test_random_CHP_state_input_validation(self):
@@ -146,7 +159,10 @@ class TestRandomFFStates:
 
         # Check dimensions
         expected_dim = 2**n_sites
-        assert rho.shape == (expected_dim, expected_dim), f"State should be {expected_dim}x{expected_dim}"
+        assert rho.shape == (
+            expected_dim,
+            expected_dim,
+        ), f"State should be {expected_dim}x{expected_dim}"
 
         # Check normalization
         assert np.allclose(np.trace(rho), 1.0), "State should be normalized"
@@ -165,7 +181,10 @@ class TestRandomFFStates:
 
         # Check dimensions
         expected_dim = 2**n_sites
-        assert rho.shape == (expected_dim, expected_dim), f"State should be {expected_dim}x{expected_dim}"
+        assert rho.shape == (
+            expected_dim,
+            expected_dim,
+        ), f"State should be {expected_dim}x{expected_dim}"
 
         # Check normalization
         assert np.allclose(np.trace(rho), 1.0), "State should be normalized"
@@ -185,7 +204,9 @@ class TestRandomFFStates:
         # Check that both are returned
         expected_dim = 2**n_sites
         assert rho.shape == (expected_dim, expected_dim), "State should be correct size"
-        assert len(s) == expected_dim, "Probability distribution should have correct length"
+        assert (
+            len(s) == expected_dim
+        ), "Probability distribution should have correct length"
 
         # Check that s is a valid probability distribution
         assert np.allclose(np.sum(s), 1.0), "Probability distribution should sum to 1"
@@ -329,10 +350,14 @@ class TestPathConstructionFunctions:
 
         # Check that first column is normalized input vector
         v_norm = v / np.linalg.norm(v)
-        assert np.allclose(orth_vecs[:, 0:1], v_norm), "First column should be normalized input"
+        assert np.allclose(
+            orth_vecs[:, 0:1], v_norm
+        ), "First column should be normalized input"
 
         # Check orthonormality
-        assert np.allclose(orth_vecs @ orth_vecs.conj().T, np.eye(n)), "Should be orthonormal"
+        assert np.allclose(
+            orth_vecs @ orth_vecs.conj().T, np.eye(n)
+        ), "Should be orthonormal"
 
     def test_get_orthogonal_vectors_zero_vector(self):
         """Test orthogonal vector generation for zero vector"""
@@ -340,7 +365,9 @@ class TestPathConstructionFunctions:
         orth_vecs = ff_rs.get_orthogonal_vectors(v)
 
         # Should return identity matrix for zero vector
-        assert np.allclose(orth_vecs, np.eye(3)), "Should return identity for zero vector"
+        assert np.allclose(
+            orth_vecs, np.eye(3)
+        ), "Should return identity for zero vector"
 
     def test_get_orthogonal_vectors_various_dimensions(self):
         """Test orthogonal vectors for various dimensions"""
@@ -349,7 +376,9 @@ class TestPathConstructionFunctions:
             orth_vecs = ff_rs.get_orthogonal_vectors(v)
 
             assert orth_vecs.shape == (n, n), f"Should be {n}x{n} for dimension {n}"
-            assert np.allclose(orth_vecs @ orth_vecs.conj().T, np.eye(n)), f"Should be orthonormal for dimension {n}"
+            assert np.allclose(
+                orth_vecs @ orth_vecs.conj().T, np.eye(n)
+            ), f"Should be orthonormal for dimension {n}"
 
     def test_build_linear_path_basic(self):
         """Test basic properties of linear path construction"""
@@ -370,7 +399,9 @@ class TestPathConstructionFunctions:
 
         # Test that intermediate points are normalized
         mid = path(0.5)
-        assert np.allclose(np.linalg.norm(mid), 1.0), "Intermediate points should be normalized"
+        assert np.allclose(
+            np.linalg.norm(mid), 1.0
+        ), "Intermediate points should be normalized"
 
     def test_build_unitary_path_basic(self):
         """Test basic properties of unitary path construction"""
@@ -386,12 +417,16 @@ class TestPathConstructionFunctions:
         w_norm = w / np.linalg.norm(w)
         v_norm = v / np.linalg.norm(v)
 
-        assert np.allclose(start, w_norm, atol=1e-10), "Path should start at normalized w"
+        assert np.allclose(
+            start, w_norm, atol=1e-10
+        ), "Path should start at normalized w"
         assert np.allclose(end, v_norm, atol=1e-10), "Path should end at normalized v"
 
         # Test that intermediate points are normalized
         mid = path(0.5)
-        assert np.allclose(np.linalg.norm(mid), 1.0), "Intermediate points should be normalized"
+        assert np.allclose(
+            np.linalg.norm(mid), 1.0
+        ), "Intermediate points should be normalized"
 
     def test_build_paths_various_vectors(self):
         """Test path construction for various vector pairs"""
@@ -410,16 +445,24 @@ class TestPathConstructionFunctions:
             w_norm = w / np.linalg.norm(w)
             v_norm = v / np.linalg.norm(v)
 
-            assert np.allclose(start_linear, w_norm), f"Linear path should start correctly for {w.flatten()}"
-            assert np.allclose(end_linear, v_norm), f"Linear path should end correctly for {v.flatten()}"
+            assert np.allclose(
+                start_linear, w_norm
+            ), f"Linear path should start correctly for {w.flatten()}"
+            assert np.allclose(
+                end_linear, v_norm
+            ), f"Linear path should end correctly for {v.flatten()}"
 
             # Test unitary path
             unitary_path = ff_rs.build_unitary_path(w, v)
             start_unitary = unitary_path(0.0)
             end_unitary = unitary_path(1.0)
 
-            assert np.allclose(start_unitary, w_norm, atol=1e-10), f"Unitary path should start correctly for {w.flatten()}"
-            assert np.allclose(end_unitary, v_norm, atol=1e-10), f"Unitary path should end correctly for {v.flatten()}"
+            assert np.allclose(
+                start_unitary, w_norm, atol=1e-10
+            ), f"Unitary path should start correctly for {w.flatten()}"
+            assert np.allclose(
+                end_unitary, v_norm, atol=1e-10
+            ), f"Unitary path should end correctly for {v.flatten()}"
 
     def test_path_normalization_preservation(self):
         """Test that paths preserve normalization throughout"""
@@ -436,8 +479,12 @@ class TestPathConstructionFunctions:
             linear_point = linear_path(t)
             unitary_point = unitary_path(t)
 
-            assert np.allclose(np.linalg.norm(linear_point), 1.0), f"Linear path should be normalized at t={t}"
-            assert np.allclose(np.linalg.norm(unitary_point), 1.0), f"Unitary path should be normalized at t={t}"
+            assert np.allclose(
+                np.linalg.norm(linear_point), 1.0
+            ), f"Linear path should be normalized at t={t}"
+            assert np.allclose(
+                np.linalg.norm(unitary_point), 1.0
+            ), f"Unitary path should be normalized at t={t}"
 
 
 class TestIntegrationAndEdgeCases:
@@ -482,14 +529,22 @@ class TestIntegrationAndEdgeCases:
 
         # Check that all mixed states are valid density matrices
         for i, rho in enumerate(states):
-            assert np.allclose(np.trace(rho), 1.0), f"Mixed state {i} should be normalized"
-            assert np.allclose(rho, rho.conj().T), f"Mixed state {i} should be Hermitian"
+            assert np.allclose(
+                np.trace(rho), 1.0
+            ), f"Mixed state {i} should be normalized"
+            assert np.allclose(
+                rho, rho.conj().T
+            ), f"Mixed state {i} should be Hermitian"
             eigenvals = np.linalg.eigvals(rho)
-            assert np.all(eigenvals >= -1e-10), f"Mixed state {i} should be positive semidefinite"
+            assert np.all(
+                eigenvals >= -1e-10
+            ), f"Mixed state {i} should be positive semidefinite"
 
         # Check that all pure states are normalized
         for i, psi in enumerate(pure_states):
-            assert np.allclose(np.linalg.norm(psi), 1.0), f"Pure state {i} should be normalized"
+            assert np.allclose(
+                np.linalg.norm(psi), 1.0
+            ), f"Pure state {i} should be normalized"
 
     def test_path_construction_edge_cases(self):
         """Test path construction for edge cases"""
@@ -502,8 +557,12 @@ class TestIntegrationAndEdgeCases:
 
         # Path should be constant
         for t in [0.0, 0.5, 1.0]:
-            assert np.allclose(linear_path(t), v_norm), "Linear path should be constant for identical vectors"
-            assert np.allclose(unitary_path(t), v_norm, atol=1e-10), "Unitary path should be constant for identical vectors"
+            assert np.allclose(
+                linear_path(t), v_norm
+            ), "Linear path should be constant for identical vectors"
+            assert np.allclose(
+                unitary_path(t), v_norm, atol=1e-10
+            ), "Unitary path should be constant for identical vectors"
 
         # Test orthogonal vectors
         w = np.array([[1], [0]])
@@ -520,5 +579,7 @@ class TestIntegrationAndEdgeCases:
 
         assert np.allclose(start_linear, w), "Linear path should start at w"
         assert np.allclose(end_linear, v), "Linear path should end at v"
-        assert np.allclose(start_unitary, w, atol=1e-10), "Unitary path should start at w"
+        assert np.allclose(
+            start_unitary, w, atol=1e-10
+        ), "Unitary path should start at w"
         assert np.allclose(end_unitary, v, atol=1e-10), "Unitary path should end at v"
