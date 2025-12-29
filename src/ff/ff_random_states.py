@@ -29,7 +29,7 @@ from .ff_lib import (
     rotate_operators,
     compute_algebra_S,
 )
-from .ff_utils import clean
+from .ff_utils import clean, cast_to_density_matrix
 
 # Check if stim package is available
 try:
@@ -38,6 +38,59 @@ try:
 except ImportError:
     STIM_AVAILABLE = False
 
+
+def random_qubit_state(n, seed=None):
+    """Generate a Haar random qubit state.
+
+    This function generates a uniformly distributed mixed state over the
+    n-qubit Hilbert space using the Haar measure on the unitary group.
+    The state is created by applying a Haar random unitary to a random
+    pdf sampled according to the Dirichlet distribution.
+
+    Args:
+        n (int): The number of qubits
+        seed (int, optional): Random seed for reproducibility
+
+    Returns:
+        numpy.ndarray: A random qubit state of dimension (2^n, 2^n) as a
+                        normalized density matrix
+
+    Raises:
+        ValueError: If n is not a positive integer
+        TypeError: If n is not an integer
+
+    Examples:
+        >>> # Generate a random single qubit state
+        >>> rho = random_qubit_state(1, seed=42)
+        >>> print(rho.shape)
+        (2, 2)
+        >>> print(np.allclose(np.trace(rho), 1.0))
+        True
+
+        >>> # Generate a random two-qubit state
+        >>> rho = random_qubit_state(2, seed=123)
+        >>> print(rho.shape)
+        (4, 4)
+    """
+    # Input validation
+    if not isinstance(n, int):
+        raise TypeError(f"Number of qubits must be an integer, got {type(n).__name__}")
+    
+    if n <= 0:
+        raise ValueError(f"Number of qubits must be positive, got {n}")
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    # Generate random pdf using Dirichlet distribution
+    s = np.random.dirichlet(np.ones(2**n))
+
+    # Apply Haar random unitary to random pdf
+    U = unitary_group.rvs(dim=2 ** n)
+
+    rho = cast_to_density_matrix(U @ np.diag(s) @ U.conj().T)
+
+    return rho
 
 
 def random_qubit_pure_state(n, seed=None):
